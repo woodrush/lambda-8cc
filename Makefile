@@ -11,19 +11,43 @@ LAMBDATOOLS=./build/lambda-calculus-devkit
 # Other
 SBCL=sbcl
 
+INPUT=input.c
 
-all: out/lambda-8cc.lam
+all: x86
 
+x86: a.out
+lam: a.lam
+
+a.s: 8cc.c.eir.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
+	( cat 8cc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.s.tmp
+	mv a.s.tmp a.s
+
+a.out: a.s elc.c.eir.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( cat elc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); echo "x86"; cat a.s ) | $(UNIPP) -o > a.out.tmp
+	mv a.out.tmp a.out
+	chmod 755 a.out
+
+a.lam: a.s elc.c.eir.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( cat elc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); echo "lam"; cat a.s ) | $(UNIPP) -o > a.lam.tmp
+	mv a.lam.tmp a.lam
+
+run-a.lam: $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	cat a.lam | $(LAM2BIN) | $(ASC2BIN) | $(UNIPP) -o
+
+compile-onepass-x86: out/lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
+	( cat out/lambda-8cc.lam | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.out
+	chmod 755 a.out
+
+
+#================================================================
+# Build the one-pass compiler
+#================================================================
 out/lambda-8cc-wrapper.lam: src/lambda-8cc.cl src/lambdacraft.cl
 	mkdir -p out
 	cd src; $(SBCL) --script lambda-8cc.cl > ../out/lambda-8cc-wrapper.lam
 
 out/lambda-8cc.lam: out/lambda-8cc-wrapper.lam 8cc.c.eir.lam elc.c.eir.lam
 	( printf '('; cat out/lambda-8cc-wrapper.lam 8cc.c.eir.lam elc.c.eir.lam; printf ')'; ) > out/lambda-8cc.lam
-
-compile: out/lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) input.c
-	( cat out/lambda-8cc.lam | $(LAM2BIN) | $(ASC2BIN); cat input.c ) | $(UNIPP) -o > a.out
-	chmod 755 a.out
 
 
 #================================================================
