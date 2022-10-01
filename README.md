@@ -12,29 +12,36 @@ For further details on handling I/O and writing programs in lambda calculus, ple
 
 ## Features
 lambda-8cc can do the following things depending on the compiler option:
-- Compile C to a x86 executable
+- Compile C to a x86 executable (a.out)
 - Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
 - Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
 - Compile ELVM assembly to x86/lambda calculus
 
-Not only can lambda-8cc compile C to x86, it can compile C to a standalone lambda calculus term that runs on a lambda calculus interpreter.
-This makes lambda-8cc self-contained in the realm of lambda calculus - even if humanity loses knowledge about the x86 instruction set,
+The nice thing about lambda calculus is that the language specs are extremely simple.
+Thus in a way we are preserving knowledge about how to compile C in a timeless method using lambda calculus.
+Even if humanity loses knowledge about the x86 instruction set,
 as long as we remember the rules for lambda calculus and have the lambda term for lambda-8cc,
 we can still use the entire C language through lambda-8cc and build everything on top of it again.
+
+Not only can lambda-8cc compile C to x86, it can compile C to a standalone lambda calculus term that runs on a lambda calculus interpreter.
+This makes lambda-8cc self-contained in the realm of lambda calculus.
+Compiled lambda terms run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by Justine Tunney,
+and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by John Tromp (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
+lambda-8cc itself should run on these interpreters as well, but currently it takes a lot of time.
 
 
 ## Running Times and Memory Usage
 Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
 The compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
 
-| Program                              | Compilation Time (8cc + elc)  | Max. RAM Usage at Compilation Time (8cc, elc)  |
-|--------------------------------------|-------------------------------|------------------------------------------------|
-| [putchar.c](./examples/putchar.c)    | 1.8 min (1.4 min + 0.4 min)   | 36 GB (36 GB, 9 GB)                            |
-| [hello.c](./examples/hello.c)        | 2.8 min (1.8 min + 1.0 min)   | 51 GB (51 GB, 27 GB)                           |
-| [echo.c](./examples/echo.c)          | 3.0 min (2.2 min + 0.8 min)   | 57 GB (57 GB, 20 GB)                           |
-| [rot13.c](./examples/rot13.c)        | 10.5 min (6.5 min + 4.0 min)  | 97 GB (97 GB, 76 GB)                           |
-| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.9 min (23.8 min, 30.1 min) | 240 GB (206 GB, 240 GB)                        |
-| [primes.c](./examples/primes.c)      | 57.3 min (25.7 min, 31.6 min) | 241 GB (200 GB, 241 GB)                        |
+| Program                              | Compilation Time (8cc + elc)   | Max. Compilation RAM Usage (8cc, elc)  | Description                                                                  |
+|--------------------------------------|--------------------------------|----------------------------------------|------------------------------------------------------------------------------|
+| [putchar.c](./examples/putchar.c)    | 1.8 min (1.4 min + 0.4 min)    | 36 GB (36 GB, 9 GB)                    | Prints `A`                                                                   |
+| [hello.c](./examples/hello.c)        | 2.8 min (1.8 min + 1.0 min)    | 51 GB (51 GB, 27 GB)                   | Prints `Hello, world!`                                                       |
+| [echo.c](./examples/echo.c)          | 3.0 min (2.2 min + 0.8 min)    | 57 GB (57 GB, 20 GB)                   | Echoes standard input                                                        |
+| [rot13.c](./examples/rot13.c)        | 10.5 min (6.5 min + 4.0 min)   | 97 GB (97 GB, 76 GB)                   | Encodes/decodes stdin to/from [ROT13](https://en.wikipedia.org/wiki/ROT13)   |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.9 min (23.8 min + 30.1 min) | 240 GB (206 GB, 240 GB)                | Prints FizzBuzz sequence up to 30                                            |
+| [primes.c](./examples/primes.c)      | 57.3 min (25.7 min + 31.6 min) | 241 GB (200 GB, 241 GB)                | Prints primes up to 100                                                      |
 
 Note that these are the compilation times.
 The running times for the compiled x86 binary are instantaneous.
