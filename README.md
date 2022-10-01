@@ -16,13 +16,14 @@ lambda-8cc can do the following things depending on the compiler option:
 Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
 The runtime and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
 
-| Program                              | Compilation Time (8cc, elc)   | Max. RAM Usage at Compilation Time (8cc, elc) |
-|--------------------------------------|-------------------------------|-----------------------------------------------|
-| [putchar.c](./examples/putchar.c)    | 1.8 min (1.4 min + 0.4 min)   | 33 GiB (33 GiB, 8 GiB)                        |
-| [hello.c](./examples/hello.c)        | 2.8 min (1.8 min + 1.0 min)   | 47 GiB (47 GiB, 25 GiB)                       |
-| [echo.c](./examples/echo.c)          | 3.0 min (2.2 min + 0.8 min)   | 53 GiB (53 GiB, 18 GiB)                       |
-| [rot13.c](./examples/rot13.c)        | 10.5 min (6.5 min + 4.0 min)  | 90 GiB (90 GiB, 70 GiB)                       |
-| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.8 min (23.8 min, 30.1 min) | 223 GiB (191 GiB, 223 GiB)                    |
+| Program                              | Compilation Time (8cc + elc)  | Max. RAM Usage at Compilation Time (8cc, elc)  |
+|--------------------------------------|-------------------------------|------------------------------------------------|
+| [putchar.c](./examples/putchar.c)    | 1.8 min (1.4 min + 0.4 min)   | 36 GB (36 GB, 9 GB)                            |
+| [hello.c](./examples/hello.c)        | 2.8 min (1.8 min + 1.0 min)   | 51 GB (51 GB, 27 GB)                           |
+| [echo.c](./examples/echo.c)          | 3.0 min (2.2 min + 0.8 min)   | 57 GB (57 GB, 20 GB)                           |
+| [rot13.c](./examples/rot13.c)        | 10.5 min (6.5 min + 4.0 min)  | 97 GB (97 GB, 76 GB)                           |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.9 min (23.8 min, 30.1 min) | 240 GB (206 GB, 240 GB)                        |
+| [primes.c](./examples/primes.c)      | (25.7 min, ) |                     | (200 GB, )
 
 lambda-8cc is a combination of the following 3 projects:
 
