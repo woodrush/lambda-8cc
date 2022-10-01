@@ -4,16 +4,12 @@ The entire plaintext lambda term is 160MB, available as a zipped file [./bin/lam
 
 lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by Rui Ueyama [@rui314](https://github.com/rui314) to lambda calculus.
 8cc is a minimal C compiler written in C, capable of compiling its own source code, 8cc.c.
-To implement lambda-8cc, I first built [LambdaVM](https://github.com/woodrush/lambdavm), a virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrarily configurable number of registers.
-Using LambdaVM, I emulated the [ELVM](https://github.com/shinh/elvm) architecture written by Shinichiro Hamaji [@shinh](https://github.com/shinh),
-compiled 8cc to ELVM assembly, and ran that assembly on LambdaVM.
 
-The entire lambda calclus term for LambdaVM, the core of lambda-8cc, is very small. Here is its entire lambda calculus term:
-
-![The lambda calculus term for LambdaVM.](./bin/lambdavm.png)
-
-Shown here is a lambda calculus term featuring a RAM unit with 8 instructions including I/O and memory operations.
-lambda-8cc is written by passing the assembly code for 8cc, written in lambda calculus terms, to LambdaVM.
+To implement lambda-8cc, I first built [LambdaVM](https://github.com/woodrush/lambdavm), a virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrarily configurable number of registers, all expressed as a closed lambda calculus term.
+Using LambdaVM, I emulated the [ELVM](https://github.com/shinh/elvm) architecture written by Shinichiro Hamaji [@shinh](https://github.com/shinh).
+lambda-8cc is made by compiling 8cc to ELVM assembly, and running that assembly (expressed as lambda calculus terms) on LambdaVM.
+The 8cc implementation used here is also part of ELVM, modified by [@shinh](https://github.com/shinh) and others.
+Compilation from C to ELVM assembly is done using ELVM's lambda calculus backend, implemented by myself by integrating LambdaVM into ELVM.
 
 
 ## Overview
@@ -156,10 +152,34 @@ lambda-8cc is also available in Lazy K, a language based on the [SKI combinator 
 
 
 ## How Does it Work?
+lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by Rui Ueyama [@rui314](https://github.com/rui314) to lambda calculus.
+8cc is a minimal C compiler written in C, capable of compiling its own source code, 8cc.c.
+
+To implement lambda-8cc, I first built [LambdaVM](https://github.com/woodrush/lambdavm), a virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrarily configurable number of registers.
+Using LambdaVM, I emulated the [ELVM](https://github.com/shinh/elvm) architecture written by Shinichiro Hamaji [@shinh](https://github.com/shinh),
+compiled 8cc to ELVM assembly, and ran that assembly on LambdaVM.
+
+The entire lambda calclus term for LambdaVM, the core of lambda-8cc, is very small. Here is its entire lambda calculus term:
+
+![The lambda calculus term for LambdaVM.](./bin/lambdavm.png)
+
+Shown here is a lambda calculus term featuring a RAM unit with 8 instructions including I/O and memory operations.
+lambda-8cc is written by passing the assembly code for 8cc, written in lambda calculus terms, to LambdaVM.
 
 
-## Does This Entirely Solve Lambda Calculus Programming?
-Not quite.
+## Code Size Efficiency
+Compiling [lisp.c](https://github.com/shinh/elvm/blob/master/test/lisp.c), a minimal Lisp implementation from the ELVM repository, to a lambda calculus term using ELVM's lambda calculus backend yields a lambda calculus term over 19,000 lines. On the other hand, the [PDF](https://woodrush.github.io/lambdalisp.pdf) showing the entire lambd a calculus term for [LambdaLisp](https://github.com/woodrush/lambdalisp) is 42 pages, with 28 lines per page, which is 1,176 lines, which is about 16 times smaller than lisp.c. It is strongly expected that further optimizations can shorten LambdaLisp's source lambda term. This large size difference highlights the fact that writing programs in the native style of lambda calculus contribute to a significant size optimization.
+Nevertheless, as mentioned earlier, it is important that we have expressed the C compilation process in lambda calculus, which is a simple and universal format of expressing algorithms.
+
+## Credits
+lambda-8cc is a combination of 3 projects, [LambdaVM](https://github.com/woodrush/lambdavm), [ELVM](https://github.com/shinh/elvm), and [8cc](https://github.com/rui314/8cc).
+[LambdaVM](https://github.com/woodrush/lambdavm) was written by [Hikaru Ikuta](https://github.com/woodrush), the author of this repository (lambda-8cc).
+The [ELVM](https://github.com/shinh/elvm) architecture was written by [Shinichiro Hamaji](https://github.com/shinh).
+[8cc](https://github.com/rui314/8cc) was written by [Rui Ueyama](https://github.com/rui314).
+The version of 8cc used in lambda-8cc is a modified version of 8cc included as a part of ELVM, modified by Shinichiro Hamaji and others.
+lambda-8cc also includes elc, a part of ELVM, which compiles ELVM assembly to x86 and lambda calculus, written by Shinichiro Hamaji.
+The lambda calculus backend for ELVM was written by Hikaru Ikuta, by integrating LambdaVM into ELVM.
+The running time and memory usage statistics were measured using a [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
 
 
 ## Detailed Stats
