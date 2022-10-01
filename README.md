@@ -16,13 +16,13 @@ lambda-8cc can do the following things depending on the compiler option:
 Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
 The runtime and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
 
-| Program                              | Runtime (8cc, elc)          | Maximum RAM Usage (8cc, elc) |
-|--------------------------------------|-----------------------------|------------------------------|
-| [putchar.c](./examples/putchar.c)    | 1.8 min (1.4 min, 0.4 min)  | 33 GB (33 GB, 8 GB)          |
-| [hello.c](./examples/hello.c)        | 2.8 min (1.8 min, 1.0 min)  | 47 GB (47 GB, 25 GB)         |
-| [echo.c](./examples/echo.c)          | 3.0 min (2.2 min, 0.8 min)  | 53 GB (53 GB, 18 GB)         |
-| [rot13.c](./examples/rot13.c)        | 10.5 min (6.5 min, 4.0 min) | 90 GB (90 GB, 70 GB)         |
-| [fizzbuzz.c](./examples/fizzbuzz.c)  | TODO min., TODO min         |  GB, GB                  |
+| Program                              | Compilation Time (8cc, elc)   | Max. RAM Usage at Compilation Time (8cc, elc) |
+|--------------------------------------|-------------------------------|-----------------------------------------------|
+| [putchar.c](./examples/putchar.c)    | 1.8 min (1.4 min + 0.4 min)   | 33 GiB (33 GiB, 8 GiB)                        |
+| [hello.c](./examples/hello.c)        | 2.8 min (1.8 min + 1.0 min)   | 47 GiB (47 GiB, 25 GiB)                       |
+| [echo.c](./examples/echo.c)          | 3.0 min (2.2 min + 0.8 min)   | 53 GiB (53 GiB, 18 GiB)                       |
+| [rot13.c](./examples/rot13.c)        | 10.5 min (6.5 min + 4.0 min)  | 90 GiB (90 GiB, 70 GiB)                       |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.8 min (23.8 min, 30.1 min) | 223 GiB (191 GiB, 223 GiB)                    |
 
 lambda-8cc is a combination of the following 3 projects:
 
