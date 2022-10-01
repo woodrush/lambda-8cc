@@ -4,18 +4,22 @@ The entire plaintext lambda term is 160MB, available as a zipped file [./bin/lam
 
 
 ## Overview
-lambda-8cc is a closed untyped lambda calculus term `lambda-8cc = \x. ...` which takes a C program written as a string as an input and outputs a x86 executable. Characters and bytes are encoded as a list of bits with `0 = \x.\y.x`, `1 = \x.\y.y`,
+lambda-8cc is a closed untyped lambda calculus term `lambda-8cc = \x. ...` which takes a C program written as a string as an input and outputs a x86 executable expressed as a list of bytes. Characters and bytes are encoded as a list of bits with `0 = \x.\y.x`, `1 = \x.\y.y`,
 and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with `cons = \x.\y.\f.(f x y)`, `nil = \x.\y.y`, so the entire computation consists solely of the beta-reduction of closed lambda terms, without the need of introducing any non-lambda type object whatsoever.
+Therefore, _everything_ in the computation process, even including integers, is expressed as pure lambda terms.
 
-For further details on handling I/O and writing programs in lambda calculus, please see the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp), a Lisp interpreter written as an untyped lambda calculus term.
+Further details on handling I/O and writing programs in lambda calculus are described in the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp), a Lisp interpreter written as an untyped lambda calculus term.
 
 
 ## Features
-lambda-8cc can do the following things depending on the compiler option:
+lambda-8cc has the following features:
+
 - Compile C to a x86 executable (a.out)
 - Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
 - Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
 - Compile ELVM assembly to x86/lambda calculus
+
+These features can be used by passing a compiler option (expressed as a lambda term) to lambda-8cc.
 
 The nice thing about lambda calculus is that the language specs are extremely simple.
 Thus in a way we are preserving knowledge about how to compile C in a timeless method using lambda calculus.
@@ -32,7 +36,11 @@ lambda-8cc itself should run on these interpreters as well, but currently it tak
 
 ## Running Times and Memory Usage
 Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
-The compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
+The compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is shown on the following table.
+
+For running memory-heavy compilation, you can dynamically extend your swap memory if you have free storage on a HDD or a USB drive.
+The stats on this table are ran with an extended swap region this way.
+Instructions are described shortly after.
 
 | Program                              | Compilation Time | Max. RAM Usage at Compilation Time  | x86 Binary Size         | Description                                                                  |
 |--------------------------------------|------------------|-------------------------------------|-------------------------|------------------------------------------------------------------------------|
@@ -45,16 +53,18 @@ The compilation time and memory usage on [Melvin Zhang](https://github.com/melvi
 
 Note that these are the compilation times.
 The running times for the compiled x86 binary are instantaneous.
-This even holds when compiling to lambda calculus terms, which also run instantaneously and only use a few gigabytes of memory.
+This even holds when compiling to lambda calculus terms, which also run instantaneously and only use a few gigabytes of memory when run on a lambda calculus interpreter.
 
+Compilations for the stats on this table were run on an Ubuntu 22.04.1 machine with 48 GB RAM, 16GB SSD swap (default partition), and 274GB (256GiB) HDD swap (dynamically added with `mkswap` and `swapon`).
+The running time shown here is the wall clock running time including memory operations.
+For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
+
+
+### Extending the Swap Memory for Memory-Heavy Compilation
 You can extend your swap region to compile programs that require a lot of memory.
 If you run Linux and have any storage device such as a HDD or USB drive,
 you can use that storage to easily and dynamically extend your swap region using `mkswap` and `swapon`.
 Instructions are explained in this [askubuntu thread](https://askubuntu.com/questions/178712/how-to-increase-swap-space).
-
-Compilations for the stats on this table were run on an Ubuntu 22.04.1 machine with 48 GB RAM, 16GB SSD swap (default partition), and 274GB (256GiB) HDD swap (dynamically added by `mkswap` and `swapon`).
-The running time shown here is the wall clock running time including memory operations.
-For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
 
 
 ## Dependent Projects
@@ -135,7 +145,6 @@ lambda-8cc is also available in Lazy K, a language based on the [SKI combinator 
 ## How Does it Work?
 
 ## Detailed Stats
-## Running Times and Memory Usage
 Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
 The compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
 
