@@ -16,12 +16,12 @@ lambda-8cc can do the following things depending on the compiler option:
 Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
 The runtime and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
 
-| Program                         | Runtime       | Maximum RAM Usage |
-|---------------------------------|---------------|-------------------|
-| [putchar.c](./examples/hello.c) | TODO min.     | TODO GB           |
-| [hello.c](./examples/hello.c)   | TODO min.     | TODO GB           |
-| [echo.c](./examples/echo.c)     | TODO min.     | TODO GB           |
-| [rot13.c](./examples/echo.c)    | TODO min.     | TODO GB           |
+| Program                         | Runtime (8cc, elc)       | Maximum RAM Usage (8cc, elc) |
+|---------------------------------|--------------------------|------------------------------|
+| [putchar.c](./examples/hello.c) | TODO min.                | TODO GB                      |
+| [hello.c](./examples/hello.c)   | TODO min.                | TODO GB                      |
+| [echo.c](./examples/echo.c)     | TODO min.                | TODO GB                      |
+| [rot13.c](./examples/rot13.c)   | 6.5 min., 4 min          | 90 GB, 70GB                  |
 
 lambda-8cc is a combination of the following 3 projects:
 
