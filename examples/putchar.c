@@ -1,4 +1,4 @@
-void putchar(char c);
+int putchar(int c);
 
 int main (void) {
     putchar('A');

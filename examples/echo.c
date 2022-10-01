@@ -1,6 +1,6 @@
 #define EOF -1
 
-int putchar(char c);
+int putchar(int c);
 char getchar(void);
 
 char c;
