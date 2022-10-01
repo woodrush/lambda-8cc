@@ -1,6 +1,4 @@
-#ifndef EOF
-#define EOF 0
-#endif
+#define EOF -1
 
 int putchar(char c);
 char getchar(void);
@@ -11,7 +9,7 @@ int main (void) {
     for (;;) {
         c = getchar();
         if (c == EOF) {
-            exit(0);
+            break;
         }
         putchar(c);
     }
