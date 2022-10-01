@@ -1,6 +1,19 @@
 # lambda-8cc: x86 C Compiler Written in Untyped Lambda Calculus
-lambda-8cc is a C compiler written as a closed untyped lambda calculus term.
+lambda-8cc is a C compiler written as a monolithic closed untyped lambda calculus term.
 The entire plaintext lambda term is 160MB, available as a zipped file [./bin/lambda-8cc.zip](./bin/lambda-8cc.zip).
+
+lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by Rui Ueyama [@rui314](https://github.com/rui314) to lambda calculus.
+8cc is a minimal C compiler written in C, capable of compiling its own source code, 8cc.c.
+To implement lambda-8cc, I first built [LambdaVM](https://github.com/woodrush/lambdavm), a virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrarily configurable number of registers.
+Using LambdaVM, I emulated the [ELVM](https://github.com/shinh/elvm) architecture written by Shinichiro Hamaji [@shinh](https://github.com/shinh),
+compiled 8cc to ELVM assembly, and ran that assembly on LambdaVM.
+
+The entire lambda calclus term for LambdaVM, the core of lambda-8cc, is very small. Here is its entire lambda calculus term:
+
+![The lambda calculus term for LambdaVM.](./bin/lambdavm.png)
+
+Shown here is a lambda calculus term featuring a RAM unit with 8 instructions including I/O and memory operations.
+lambda-8cc is written by passing the assembly code for 8cc, written in lambda calculus terms, to LambdaVM.
 
 
 ## Overview
@@ -143,6 +156,11 @@ lambda-8cc is also available in Lazy K, a language based on the [SKI combinator 
 
 
 ## How Does it Work?
+
+
+## Does This Entirely Solve Lambda Calculus Programming?
+Not quite.
+
 
 ## Detailed Stats
 Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
