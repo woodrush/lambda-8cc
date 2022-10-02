@@ -1,0 +1,4 @@
+[submodule "elvm-private"]
+	path = elvm-private
+	url = github.com:woodrush/elvm-private
+	branch = lambda-8cc
