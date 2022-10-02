@@ -1,5 +1,6 @@
 # Binary lambda calculus interpreter
 UNIPP=./bin/uni++
+CLAMB=./bin/clamb
 
 # Tools
 ASC2BIN=./bin/asc2bin
@@ -7,6 +8,12 @@ LAM2BIN=./bin/lam2bin
 
 # Toolkit
 LAMBDATOOLS=./build/lambda-calculus-devkit
+
+# ELVM
+8CC=./elvm-private/out/8cc
+ELC=./elvm-private/out/elc
+8CCLAM=./8cc.lam
+ELCLAM=./elc.lam
 
 # Other
 SBCL=sbcl
@@ -19,16 +26,18 @@ x86: a.out
 lam: a.lam
 
 a.s: 8cc.c.eir.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( cat 8cc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.s.tmp
+	( cat 8cc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | /usr/bin/time -v $(UNIPP) -o > a.s.tmp
+	# ( cat 8cc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(CLAMB) -u > a.s.tmp
 	mv a.s.tmp a.s
 
 a.out: a.s elc.c.eir.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( cat elc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); echo "x86"; cat a.s ) | $(UNIPP) -o > a.out.tmp
+	( cat elc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); echo "x86"; cat a.s ) | /usr/bin/time -v $(UNIPP) -o > a.out.tmp
+	# ( cat elc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); echo "x86"; cat a.s ) | $(CLAMB) -u > a.out.tmp
 	mv a.out.tmp a.out
 	chmod 755 a.out
 
 a.lam: a.s elc.c.eir.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( cat elc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); echo "lam"; cat a.s ) | $(UNIPP) -o > a.lam.tmp
+	( cat elc.c.eir.lam | $(LAM2BIN) | $(ASC2BIN); echo "lam"; cat a.s ) | /usr/bin/time -v$(UNIPP) -o > a.lam.tmp
 	mv a.lam.tmp a.lam
 
 run-a.lam: $(LAM2BIN) $(ASC2BIN) $(UNIPP)
@@ -48,6 +57,20 @@ out/lambda-8cc-wrapper.lam: src/lambda-8cc.cl src/lambdacraft.cl
 
 out/lambda-8cc.lam: out/lambda-8cc-wrapper.lam 8cc.c.eir.lam elc.c.eir.lam
 	( printf '('; cat out/lambda-8cc-wrapper.lam 8cc.c.eir.lam elc.c.eir.lam; printf ')'; ) > out/lambda-8cc.lam
+
+
+#================================================================
+# Build 8cc.lam and elc.lam
+#================================================================
+.PHONY: 8cc
+8cc: $(8CC)
+$(8CC): $(wildcard elvm-private/8cc/*.c)
+	cd elvm-private && make && cp out/8cc ../bin
+
+.PHONY: elc
+elc: $(ELC)
+$(ELC): $(wildcard elvm-private/target/*.c)
+	cd elvm-private && make && cp out/elc ../bin
 
 
 #================================================================
