@@ -65,26 +65,32 @@ out/lambda-8cc.lam: out/lambda-8cc-wrapper.lam 8cc.c.eir.lam elc.c.eir.lam
 .PHONY: 8cc
 8cc: $(8CC)
 $(8CC): $(wildcard elvm-private/8cc/*.c)
-	git submodule update --remote
+	git submodule update --init --remote
 	cd elvm-private && make out/8cc && cp out/8cc ../bin
 
 .PHONY: elc
 elc: $(ELC)
 $(ELC): $(wildcard elvm-private/target/*.c)
-	git submodule update --remote
+	git submodule update --init --remote
 	cd elvm-private && make out/elc && cp out/elc ../bin
 
 elvm-private/out/8cc.c: $(8CC)
+	git submodule update --init --remote
 	cd elvm-private && make out/8cc.c
 
 elvm-private/out/elc.c: $(ELC)
+	git submodule update --init --remote
 	cd elvm-private && make out/elc.c
 
 out/8cc.eir: elvm-private/out/8cc.c $(8CC)
-	cd elvm-private; out/8cc -S -I. -Ilibc -Iout -o ../out/8cc.eir out/8cc.c
+	mkdir -p out
+	git submodule update --init --remote
+	cd elvm-private; out/8cc -S -I. -Ilibc -Iout -o out/8cc.eir out/8cc.c && mv out/8cc.eir ../out
 
 out/elc.eir: elvm-private/out/elc.c $(8CC)
-	cd elvm-private; out/8cc -S -I. -Ilibc -Iout -o ../out/elc.eir out/elc.c
+	mkdir -p out
+	git submodule update --init --remote
+	cd elvm-private; out/8cc -S -I. -Ilibc -Iout -o out/elc.eir out/elc.c && mv out/elc.eir ../out
 
 8cc.lam: out/8cc.eir $(ELC)
 	$(ELC) -lam out/8cc.eir > 8cc.lam
