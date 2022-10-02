@@ -74,6 +74,24 @@ $(ELC): $(wildcard elvm-private/target/*.c)
 	git submodule update --remote
 	cd elvm-private && make out/elc && cp out/elc ../bin
 
+elvm-private/out/8cc.c: $(8CC)
+	cd elvm-private && make out/8cc.c
+
+elvm-private/out/elc.c: $(ELC)
+	cd elvm-private && make out/elc.c
+
+out/8cc.eir: elvm-private/out/8cc.c $(8CC)
+	cd elvm-private; out/8cc -S -I. -Ilibc -Iout -o ../out/8cc.eir out/8cc.c
+
+out/elc.eir: elvm-private/out/elc.c $(8CC)
+	cd elvm-private; out/8cc -S -I. -Ilibc -Iout -o ../out/elc.eir out/elc.c
+
+8cc.lam: out/8cc.eir $(ELC)
+	$(ELC) -lam out/8cc.eir > 8cc.lam
+
+elc.lam: out/elc.eir $(ELC)
+	$(ELC) -lam out/elc.eir > elc.lam
+
 
 #================================================================
 # Build the lambda calculus interpreters and tools
