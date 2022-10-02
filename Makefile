@@ -10,8 +10,8 @@ LAM2BIN=./bin/lam2bin
 LAMBDATOOLS=./build/lambda-calculus-devkit
 
 # ELVM
-8CC=./elvm-private/out/8cc
-ELC=./elvm-private/out/elc
+8CC=./bin/8cc
+ELC=./bin/elc
 8CCLAM=./8cc.lam
 ELCLAM=./elc.lam
 
@@ -65,12 +65,14 @@ out/lambda-8cc.lam: out/lambda-8cc-wrapper.lam 8cc.c.eir.lam elc.c.eir.lam
 .PHONY: 8cc
 8cc: $(8CC)
 $(8CC): $(wildcard elvm-private/8cc/*.c)
-	cd elvm-private && make && cp out/8cc ../bin
+	git submodule update --remote
+	cd elvm-private && make out/8cc && cp out/8cc ../bin
 
 .PHONY: elc
 elc: $(ELC)
 $(ELC): $(wildcard elvm-private/target/*.c)
-	cd elvm-private && make && cp out/elc ../bin
+	git submodule update --remote
+	cd elvm-private && make out/elc && cp out/elc ../bin
 
 
 #================================================================
