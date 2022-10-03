@@ -1,11 +1,49 @@
 # lambda-8cc: x86 C Compiler Written in Untyped Lambda Calculus
-lambda-8cc is a C compiler written as a monolithic closed untyped lambda calculus term.
+lambda-8cc is a x86 C compiler written as a monolithic closed untyped lambda calculus term.
 The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip).
 
+This is over 200 times larger than my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
+a Lisp interpreter written as a 42-page long untyped lambda calculus term,
+which can be seen in [this PDF](https://woodrush.github.io/lambdalisp.pdf).
+
+lambda-8cc is based on the following 3 projects:
+
+- [LambdaVM](https://github.com/woodrush/lambdavm) written by the author of this repo [Hikaru Ikuta](https://github.com/woodrush)
+  - A programmable virtual CPU written as an untyped lambda calculus term
+- [8cc](https://github.com/rui314/8cc) by [Rui Ueyama](https://github.com/rui314)
+  - A minimal C compiler written in C, capable of compiling its own source code
+  - lambda-8cc is made by porting 8cc to LambdaVM.
+- [ELVM](https://github.com/shinh/elvm) by [Shinichiro Hamaji](https://github.com/shinh)
+  - A C compiler infrastructure for [esoteric programming languages](https://en.wikipedia.org/wiki/Esoteric_programming_language)
+  - I integrated LambdaVM into ELVM to build a C compiler that compiles C to lambda calculus.
+  - Using this compiler, I ported 8cc to lambda calculus and made lambda-8cc, which compiles C to x86.
+
+I also used [LambdaCraft](https://github.com/woodrush/lambdacraft) written by myself, which is a Common Lisp DSL for building large lambda calculus programs,
+also used to build [LambdaLisp](https://github.com/woodrush/lambdalisp).
+
+
+## Overview
+### Everything is Done as Lambdas
+lambda-8cc is written as a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs a x86 executable expressed as a list of bytes.
+Characters and bytes are encoded as a list of bits with $0 = \lambda x. \lambda y.x$, $1 = \lambda x. \lambda y.y$,
+and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with ${\rm cons} = \lambda x.\lambda y.\lambda f.(f x y)$, ${\rm nil} = \lambda x.\lambda y.y$.
+
+Therefore, _everything_ in the computation process, even including integers, is expressed as pure lambda terms,
+without the need of introducing any non-lambda type object whatsoever.
+lambda-8cc makes [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#%CE%B2-reduction) the sole requirement for compiling C to x86.
+Note that the process doesn't depend on the choice of variable names as well.
+Instead of encoding the character `A` as a variable with the name `A`, it is encoded as a list of bits of its ASCII encoding `01000001`.
+
+Various lambda calculus interpreters automatically handle this I/O format so that it runs on the terminal - standard input is encoded into lambda terms, and the output lambda term is decoded and shown on the terminal.
+Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like gcc.
+
+
+### How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
 To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm),
 a programmable virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrary number of registers,
 all expressed as a single lambda calculus term.
-Despite its rather rich capability, LambdaVM has a very small lambda calculus term. Here is its entire term:
+Despite its rather rich capability, LambdaVM has a very small lambda calculus term.
+Here is its entire lambda calculus term in plaintext:
 
 ```text
 LambdaVM = \x.\y.\z.\a.\b.((\c.((\d.((\e.((\f.((\g.((\h.(a ((\i.(i (d (\j.\k.(k 
@@ -31,29 +69,14 @@ w u r)))))) (\t.\u.(l (s t u) (s u t))))) (h o (o (\s.\t.t) (\s.\t.s))))))))) (k
 ))) ((\c.(y c (x c (\d.\e.e)))) (\c.\d.(d (\e.\f.e) c))))
 ```
 
-Shown here is a lambda calculus term featuring a programmable virtual CPU with 8 instructions including I/O and memory operations.
-It is also available as [an image](./bin/lambdavm.png).
+Shown here is a lambda calculus term featuring a RAM unit with 8 instructions including I/O and memory operations.
+It is also available [here](./bin/lambdavm.png) as an image.
 LambdaVM is also a self-contained project where you can enjoy assembly programming in lambda calculus.
 
-lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by [Rui Ueyama](https://github.com/rui314) to lambda calculus, written in C.
-lambda-8cc is made by running 8cc on LambdaVM.
-To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture written by [Shinichiro Hamaji](https://github.com/shinh) to compile C to a lambda calculus term compatible with LambdaVM.
-
-
-## Overview
-### Everything is Done as Lambdas
-lambda-8cc is a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs a x86 executable expressed as a list of bytes.
-Characters and bytes are encoded as a list of bits with $0 = \lambda x. \lambda y.x$, $1 = \lambda x. \lambda y.y$,
-and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with ${\rm cons} = \lambda x.\lambda y.\lambda f.(f x y)$, ${\rm nil} = \lambda x.\lambda y.y$.
-
-Therefore, _everything_ in the computation process, even including integers, is expressed as pure lambda terms,
-without the need of introducing any non-lambda type object whatsoever.
-lambda-8cc makes [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#%CE%B2-reduction) the sole requirement for compiling C to x86.
-Note that the process doesn't depend on the choice of variable names as well.
-Instead of encoding the character `A` as a variable with the name `A`, it is encoded as a list of bits of its ASCII encoding `01000001`.
-
-Various lambda calculus interpreters automatically handle this I/O format so that it runs on the terminal - standard input is encoded into lambda terms, and the output lambda term is decoded and shown on the terminal.
-Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like gcc.
+Based on LambdaVM, I built lambda-8cc by porting the C compiler [8cc](https://github.com/rui314/8cc) written in C by [Rui Ueyama](https://github.com/rui314) to LambdaVM.
+This is done by compiling 8cc's C source code to an assembly for LambdaVM.
+To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture written by [Shinichiro Hamaji](https://github.com/shinh)
+to build a C compiler for LambdaVM, which I used to compile 8cc itself.
 
 
 ### C to Lambda Calculus
@@ -229,6 +252,7 @@ Further details are explained in [details.md](details.md).
 
 However, on currently existing lambda calculus interpreters, the RAM usage explodes for such large programs. 
 It would be very exciting to have a lambda calculus interpreter that runs lambda-8cc in a practical time and memory.
+
 
 
 ## Usage
