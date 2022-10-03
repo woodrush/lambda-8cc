@@ -101,3 +101,10 @@
 (def-lazy "-" (list t t nil t nil nil t nil))
 (def-lazy "[" (list t nil t nil nil t nil nil))
 (def-lazy "]" (list t nil t nil nil nil t nil))
+(def-lazy "/" (list t t nil t nil nil nil nil))
+(def-lazy "0" (list t t nil nil t t t t))
+(def-lazy "1" (list t t nil nil t t t nil))
+(def-lazy "2" (list t t nil nil t t nil t))
+(def-lazy "3" (list t t nil nil t t nil nil))
+(def-lazy "4" (list t t nil nil t nil t t))
+

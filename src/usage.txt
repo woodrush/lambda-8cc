@@ -1,3 +1,5 @@
+lambda-8cc v1.0.0
+
 Usage:
     apply lambda-8cc.lam [input-file]
     apply lambda-8cc.lam [option] [input-file]
@@ -13,3 +15,11 @@ Options:
     (\f.(f (\x.\y.y) (\x.\y.\z.\a.\b.y) (\x.x))) : ELVM assembly to *.lam
     (\f.(f (\x.\y.y) (\x.\y.\z.\a.\b.z) (\x.x))) : ELVM assembly to *.blc
     (\f.(f (\x.\y.y) (\x.\y.\z.\a.\b.a) (\x.x))) : ELVM assembly to *.lazy
+
+lambda-8cc includes the following projects. All of the following projects
+are released under the MIT license. See the LICENSE in each location for details.
+    8cc: By Rui Ueyama - https://github.com/rui314/8cc
+    ELVM: By Shinichiro Hamaji - https://github.com/shinh/elvm
+    LambdaVM: By Hikaru Ikuta - https://github.com/woodrush/lambdavm
+    lambda-8cc: By Hikaru Ikuta - https://github.com/woodrush/lambda-8cc
+
