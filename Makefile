@@ -43,7 +43,7 @@ a.out: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	mv $@.tmp $@
 	chmod 755 a.out
 
-x86-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+a.out-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( cat lambda-8cc.lam | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
 	chmod 755 a.out
 
@@ -63,16 +63,16 @@ a.lazy: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 
-lam-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.lam.tmp
+lam-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.lam.tmp
 	mv a.lam.tmp a.lam
 
-blc-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_BLC) ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.blc.tmp
+blc-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_BLC) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.blc.tmp
 	mv a.blc.tmp a.blc
 
-lazy-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.lazy.tmp
+lazy-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.lazy.tmp
 	mv a.lazy.tmp a.lazy
 
 
