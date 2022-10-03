@@ -155,11 +155,11 @@ The following table shows the compilation time and memory usage on [Melvin Zhang
 | Program                              | Compilation Time | Max. RAM Usage at Compilation Time  | x86 Binary Size         | Description                                                                  |
 |--------------------------------------|------------------|-------------------------------------|-------------------------|------------------------------------------------------------------------------|
 | [putchar.c](./examples/putchar.c)    | 1.8 min          | 36 GB                               | 342 bytes               | Prints `A`                                                                   |
-| [hello.c](./examples/hello.c)        | 2.8 min          | 51 GB                               | 802 bytes               | Prints `Hello, world!`                                                       |
-| [echo.c](./examples/echo.c)          | 3.0 min          | 57 GB                               | 663 bytes               | Echoes standard input                                                        |
-| [rot13.c](./examples/rot13.c)        | 10.5 min         | 97 GB                               | 2,118 bytes             | Encodes/decodes stdin to/from [ROT13](https://en.wikipedia.org/wiki/ROT13)   |
-| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.9 min         | 240 GB                              | 5,512 bytes             | Prints FizzBuzz sequence up to 30                                            |
-| [primes.c](./examples/primes.c)      | 57.3 min         | 241 GB                              | 5,500 bytes             | Prints primes up to 100                                                      |
+| [hello.c](./examples/hello.c)        | 2.4 min          | 51 GB                               | 802 bytes               | Prints `Hello, world!`                                                       |
+| [echo.c](./examples/echo.c)          | 2.5 min          | 57 GB                               | 663 bytes               | Echoes standard input                                                        |
+| [rot13.c](./examples/rot13.c)        | 7.7 min          | 84 GB                               | 2,118 bytes             | Encodes/decodes stdin to/from [ROT13](https://en.wikipedia.org/wiki/ROT13)   |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min         | 240 GB                              | 5,512 bytes             | Prints FizzBuzz sequence up to 30                                            |
+| [primes.c](./examples/primes.c)      | 53.0 min         | 241 GB                              | 5,500 bytes             | Prints primes up to 100                                                      |
 
 Now that is a lot of memory!
 To compile programs that require a huge RAM, you can extend your swap region without changing the partition settings by using a swap file.
