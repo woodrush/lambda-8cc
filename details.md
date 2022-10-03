@@ -51,9 +51,30 @@ The compilation time and memory usage on [Melvin Zhang](https://github.com/melvi
 | [putchar.c](./examples/putchar.c)    | 1.8 min (1.5 min + 0.3 min)    | 31 GB (31 GB, 7 GB)                     | 342 bytes               |
 | [hello.c](./examples/hello.c)        | 2.4 min (1.6 min + 0.8 min)    | 42 GB (42 GB, 22 GB)                    | 802 bytes               |
 | [echo.c](./examples/echo.c)          | 2.5 min (1.8 min + 0.7 min)    | 46 GB (46 GB, 17 GB)                    | 663 bytes               |
-| [rot13.c](./examples/rot13.c)        | 7.7 min (5.0 min + 2.7 min)    | TODO GB (TODO GB, 65 GB)                | 2,118 bytes             |
+| [rot13.c](./examples/rot13.c)        | 7.7 min (5.0 min + 2.7 min)    | 84 GB (84 GB, 65 GB)                    | 2,118 bytes             |
 | [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min (22.2 min + 27.5 min) | 200 GB (177 GB, 200 GB)                 | 5,512 bytes             |
-| [primes.c](./examples/primes.c)      | 53.0 min (24.0 min + 29.0 min) | (172 GB, ? GB)                          | 5,500 bytes             |
+| [primes.c](./examples/primes.c)      | 53.0 min (24.0 min + 29.0 min) | 200 GB (172 GB, 200 GB)                 | 5,500 bytes             |
+
+
+## Building From Source
+### Requirements
+- gcc (11.2.0)
+- ruby (3.0.2p107) (used for building 8cc.c and elc.c in ELVM)
+- SBCL (2.1.11) (used for building lambda-8cc-main.lam)
+
+
+### Building
+lambda-8cc.lam can be built from source by simply running:
+
+```sh
+make lambda-8cc.lam
+```
+
+The build flow is approximately as follows:
+
+- In the ELVM submodule
+- Build 8cc and elc in ELVM
+- Build `build/8cc.c` and `build/elc.c` 
 
 
 ## Self-Hosting Test
