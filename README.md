@@ -6,6 +6,7 @@ To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdav
 a programmable virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrary number of registers,
 all expressed as a single lambda calculus term.
 Despite its rather rich capability, LambdaVM has a very small lambda calculus term shown in [lambdavm.png](./bin/lambdavm.png).
+LambdaVM is also a self-contained project where you can enjoy assembly programming in lambda calculus.
 
 lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by [Rui Ueyama](https://github.com/rui314) to lambda calculus, written in C.
 lambda-8cc is made by running 8cc on LambdaVM.
@@ -24,18 +25,23 @@ lambda-8cc makes [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#
 Note that the process doesn't depend on the choice of variable names as well.
 Instead of encoding the character `A` as a variable with the name `A`, it is encoded as a list of bits of its ASCII encoding `01000001`.
 
+Various lambda calculus interpreters automatically handle this I/O format so that it runs on the terminal - standard input is encoded into lambda terms, and the output lambda term is decoded and shown on the terminal.
+Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like gcc.
+
+
 ### C to Lambda Calculus
 Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus itself.
 Compiled lambda calculus terms run on the same lambda calculus interpreter used to run lambda-8cc.
 This makes lambda-8cc self-contained in the realm of lambda calculus.
 The output program can also be run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by Justine Tunney,
-and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by John Tromp (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
+and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by [John Tromp](https://github.com/tromp) (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
 
 The nice thing about lambda calculus is that the language specs are extremely simple.
 With lambda-8cc, in a way we are preserving knowledge about how to compile C in a timeless method.
 Even if humanity loses knowledge about the x86 instruction set,
 as long as we remember the rules for lambda calculus and have the lambda term for lambda-8cc,
 we can still use the entire C language through lambda-8cc and build everything on top of it again.
+
 
 ### Further Details
 For further details on how I/O is handled and how programs are written in lambda calculus,
@@ -44,7 +50,7 @@ a Lisp interpreter written as an untyped lambda calculus term.
 
 
 ## Example
-Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard input to/from the [ROT13](https://en.wikipedia.org/wiki/ROT13) encoding.
+Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard input to/from the [ROT13](https://en.wikipedia.org/wiki/ROT13) cipher.
 It compiles without errors using gcc:
 
 ```c
@@ -83,12 +89,21 @@ $ chmod 755 a.out
 
 $ echo "Hello, world!" | ./a.out
 Uryyb, jbeyq!
+$ echo "Uryyb, jbeyq!" | ./a.out
+Hello, world!
 ```
 
 Here, uni++ is a very fast [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
 This takes about 8 minutes to run on my machine.
 More running time stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 Detailed usage instructions are available in the [Usage](#usage) section.
+
+rot13.c can be used to decode the hint message of the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by [John Tromp](https://github.com/tromp), uncovering some of the secrets of the magical lambda calculus interpreter which the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in shape of a λ:
+
+```sh
+wget https://www.ioccc.org/2012/tromp/how13
+cat how13 | ./a.out
+```
 
 
 ### What is lambda-8cc.Blc?
@@ -246,7 +261,7 @@ To compile an ELVM assembly listing `a.s` to x86 executable `a.out`:
 chmod 755 a.out
 ```
 
-As described before, by separately compiling `a.s` and `a.out`, the maximum RAM usage can be cut in half since the memory is freed when each process finishes.
+As described before, by separately compiling `a.s` and `a.out` using these commands, the maximum RAM usage can be cut in half since the memory is freed when each process finishes.
 
 The full set of options can be shown by running lambda-8cc without any input or options,
 showing a usage message:
