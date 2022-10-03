@@ -92,6 +92,36 @@ run-a.lazy: $(LAZYK)
 
 
 #================================================================
+# Self-hosting test
+#================================================================
+out/8cc-self.s: out/8cc.c $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+out/elc-self.s: out/elc.c $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+out/8cc-self.lam: out/8cc-self.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+out/elc-self.lam: out/elc-self.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+out/lambda-8cc-self.lam: out/lambda-8cc-main.lam out/8cc-self.lam out/elc-self.lam
+	( printf '('; cat $^; printf ')'; ) > $@
+
+test-self-host: out/lambda-8cc-self.lam
+	diff out/8cc-self.s out/8cc.eir || exit 1
+	diff out/elc-self.s out/elc.eir || exit 1
+	diff out/8cc-self.lam out/8cc.lam || exit 1
+	diff out/elc-self.lam out/elc.lam || exit 1
+	diff out/lambda-8cc-self.lam lambda-8cc.lam || exit 1
+
+
+#================================================================
 # Build lambda-8cc.lam
 #================================================================
 src/usage.cl: src/usage.txt src/compile-usage.sh
