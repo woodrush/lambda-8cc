@@ -1,15 +1,19 @@
 # lambda-8cc: x86 C Compiler Written in Untyped Lambda Calculus
 lambda-8cc is a C compiler written as a monolithic closed untyped lambda calculus term.
-The entire plaintext lambda term is 160MB, available as a zipped file [./bin/lambda-8cc.zip](./bin/lambda-8cc.zip).
+The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.zip](./bin/lambda-8cc.zip).
 
-lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by Rui Ueyama [@rui314](https://github.com/rui314) to lambda calculus.
-8cc is a minimal C compiler written in C, capable of compiling its own source code, 8cc.c.
+lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by [Rui Ueyama](https://github.com/rui314) to lambda calculus, written in C.
+To run C on lambda calculus, I first made another project [LambdaVM](https://github.com/woodrush/lambdavm),
+and modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture written by [Shinichiro Hamaji](https://github.com/shinh)
+to compile C to lambda calculus.
+
+<!-- 8cc is a minimal C compiler written in C, capable of compiling its own source code, 8cc.c.
 
 To implement lambda-8cc, I first built [LambdaVM](https://github.com/woodrush/lambdavm), a virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrarily configurable number of registers, all expressed as a closed lambda calculus term.
 Using LambdaVM, I emulated the [ELVM](https://github.com/shinh/elvm) architecture written by Shinichiro Hamaji [@shinh](https://github.com/shinh).
 lambda-8cc is made by compiling 8cc to ELVM assembly, and running that assembly (expressed as lambda calculus terms) on LambdaVM.
 The 8cc implementation used here is also part of ELVM, modified by [@shinh](https://github.com/shinh) and others.
-Compilation from C to ELVM assembly is done using ELVM's lambda calculus backend, implemented by myself by integrating LambdaVM into ELVM.
+Compilation from C to ELVM assembly is done using ELVM's lambda calculus backend, implemented by myself by integrating LambdaVM into ELVM. -->
 
 
 ## Overview
@@ -20,13 +24,108 @@ Therefore, _everything_ in the computation process, even including integers, is 
 Further details on handling I/O and writing programs in lambda calculus are described in the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp), a Lisp interpreter written as an untyped lambda calculus term.
 
 
+## Example
+Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard input to/from the [ROT13](https://en.wikipedia.org/wiki/ROT13) encoding:
+
+```c
+#define EOF -1
+
+int putchar(int c);
+char getchar(void);
+
+char c;
+int offset;
+
+int main (void) {
+    for (;;) {
+        c = getchar();
+        if (c == EOF) {
+            break;
+        }
+
+        offset = 0;
+        if (('a' <= c && c < 'n') || ('A' <= c && c < 'N')) {
+            offset = 13;
+        } else if (('n' <= c && c <= 'z') || ('N' <= c && c <= 'Z')) {
+            offset = -13;
+        }
+        putchar(c + offset);
+    }
+    return 0;
+}
+```
+
+This program can be compiled by lambda-8cc out of the box as follows:
+
+```sh
+$ cat lambda-8cc.Blc examples/rot13.c | bin/uni++ -o > a.out
+$ chmod 755 a.out
+
+$ echo "Hello, world!" | ./a.out
+Uryyb, jbeyq!
+```
+
+Here, uni++ is a very fast [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
+This takes about 8 minutes to compile using 65 GB of RAM.
+Smaller programs such as [putchar.c](./examples/putchar.c) can be compiled in 2 minutes using 31 GB of RAM.
+More detailed stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
+
+lambda-8cc.Blc is lambda-8cc.lam written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation, made as follows:
+
+```sh
+$ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc
+```
+
+lam2bin is a utility that converts plaintext lambda calculus notation such as `\x.x` to [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation, written by [Justine Tunney](https://github.com/jart) (available at [https://justine.lol/lambda/](https://justine.lol/lambda/)).
+Binary lambda calculus (BLC) is a highly compact notation for writing lambda calculus terms using only `0` and `1`, proposed by [John Tromp](https://github.com/tromp).
+Any lambda term with an arbitrary number of variables can be rewritten to BLC notation.
+For example, `\x.x` becomes `0010`.
+I've written details on the BLC notation in my [blog post](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation).
+
+[asc2bin](https://github.com/woodrush/lambda-calculus-devkit/blob/main/src/asc2bin.c) is a utility that packs the 0/1 ASCII bitstream to a byte stream.
+Using this tool, the encoding `0010` for `\x.x` becomes only half a byte.
+uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
+
+
+## Running Times and Memory Usage
+The following table shows the compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s
+[lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus).
+
+| Program                              | Compilation Time | Max. RAM Usage at Compilation Time  | x86 Binary Size         | Description                                                                  |
+|--------------------------------------|------------------|-------------------------------------|-------------------------|------------------------------------------------------------------------------|
+| [putchar.c](./examples/putchar.c)    | 1.8 min          | 36 GB                               | 342 bytes               | Prints `A`                                                                   |
+| [hello.c](./examples/hello.c)        | 2.8 min          | 51 GB                               | 802 bytes               | Prints `Hello, world!`                                                       |
+| [echo.c](./examples/echo.c)          | 3.0 min          | 57 GB                               | 663 bytes               | Echoes standard input                                                        |
+| [rot13.c](./examples/rot13.c)        | 10.5 min         | 97 GB                               | 2,118 bytes             | Encodes/decodes stdin to/from [ROT13](https://en.wikipedia.org/wiki/ROT13)   |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.9 min         | 240 GB                              | 5,512 bytes             | Prints FizzBuzz sequence up to 30                                            |
+| [primes.c](./examples/primes.c)      | 57.3 min         | 241 GB                              | 5,500 bytes             | Prints primes up to 100                                                      |
+
+To compile programs that require a lot of memory, you can extend your swap region by using a swap file.
+If you run Linux and have any storage device such as a HDD or USB drive,
+you can use that storage to easily and dynamically extend your swap region using `mkswap` and `swapon`.
+The stats on this table are ran with an extended swap region this way.
+Instructions are explained in this [askubuntu thread](https://askubuntu.com/questions/178712/how-to-increase-swap-space).
+
+Note that these are the compilation times.
+The running times for the compiled x86 binary are instantaneous.
+This even holds when compiling to lambda calculus terms.
+Compiled lambda terms also run instantaneously and only use a few gigabytes of memory when run on a lambda calculus interpreter.
+
+The compilations for these stats were run on an Ubuntu 22.04.1 machine with 48 GB RAM,
+16GB SSD swap (default partition), and 274GB (256GiB) HDD swap (dynamically added with `mkswap` and `swapon`).
+The running time shown here is the wall clock running time including memory operations.
+For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
+
+
+
 ## Features
 lambda-8cc has the following features:
 
 - Compile C to a x86 executable (a.out)
 - Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
+- Compile C to a [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (executable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
 - Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
-- Compile ELVM assembly to x86/lambda calculus
+- Compile ELVM assembly to x86/lambda calculus/SKI combinator calculus
 
 These features can be used by passing a compiler option (expressed as a lambda term) to lambda-8cc.
 
@@ -43,45 +142,8 @@ and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioc
 lambda-8cc itself should run on these interpreters as well, but currently it takes a lot of time.
 
 
-## Running Times and Memory Usage
-Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
-The compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is shown on the following table.
-
-For running memory-heavy compilation, you can dynamically extend your swap memory if you have free storage on a HDD or a USB drive.
-The stats on this table are ran with an extended swap region this way.
-Instructions are described shortly after.
-
-| Program                              | Compilation Time | Max. RAM Usage at Compilation Time  | x86 Binary Size         | Description                                                                  |
-|--------------------------------------|------------------|-------------------------------------|-------------------------|------------------------------------------------------------------------------|
-| [putchar.c](./examples/putchar.c)    | 1.8 min          | 36 GB                               | 342 bytes               | Prints `A`                                                                   |
-| [hello.c](./examples/hello.c)        | 2.8 min          | 51 GB                               | 792 bytes               | Prints `Hello, world!`                                                       |
-| [echo.c](./examples/echo.c)          | 3.0 min          | 57 GB                               | 663 bytes               | Echoes standard input                                                        |
-| [rot13.c](./examples/rot13.c)        | 10.5 min         | 97 GB                               | 2,118 bytes             | Encodes/decodes stdin to/from [ROT13](https://en.wikipedia.org/wiki/ROT13)   |
-| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.9 min         | 240 GB                              | 5,512 bytes             | Prints FizzBuzz sequence up to 30                                            |
-| [primes.c](./examples/primes.c)      | 57.3 min         | 241 GB                              | 5,500 bytes             | Prints primes up to 100                                                      |
-
-Note that these are the compilation times.
-The running times for the compiled x86 binary are instantaneous.
-This even holds when compiling to lambda calculus terms, which also run instantaneously and only use a few gigabytes of memory when run on a lambda calculus interpreter.
-
-Compilations for the stats on this table were run on an Ubuntu 22.04.1 machine with 48 GB RAM, 16GB SSD swap (default partition), and 274GB (256GiB) HDD swap (dynamically added with `mkswap` and `swapon`).
-The running time shown here is the wall clock running time including memory operations.
-For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
-
-
-### Extending the Swap Memory for Memory-Heavy Compilation
-You can extend your swap region to compile programs that require a lot of memory.
-If you run Linux and have any storage device such as a HDD or USB drive,
-you can use that storage to easily and dynamically extend your swap region using `mkswap` and `swapon`.
-Instructions are explained in this [askubuntu thread](https://askubuntu.com/questions/178712/how-to-increase-swap-space).
-
-
 ## Dependent Projects
 lambda-8cc is a combination of the following 3 projects:
-
-<!-- - [LambdaVM](https://github.com/woodrush/lambdavm) written by Hikaru Ikuta [@woodrush](https://github.com/woodrush), the author of this repository (lambda-8cc)
-- [8cc](https://github.com/rui314/8cc) written by Rui Ueyama [@rui314](https://github.com/rui314)
-- [ELVM](https://github.com/shinh/elvm) written by Shinichiro Hamaji [@shinh](https://github.com/shinh) -->
 
 - [LambdaVM](https://github.com/woodrush/lambdavm) (written by the author of this repository (lambda-8cc), Hikaru Ikuta [@woodrush](https://github.com/woodrush))
   - LambdaVM is a virtual CPU with the Harvard Architecture supporting an extended [ELVM](https://github.com/shinh/elvm) instruction set written in untyped lambda calculus.
@@ -98,7 +160,10 @@ lambda-8cc is a combination of the following 3 projects:
 
 
 ## Theoretically Self-Hosting
-Since 8cc can compile its own source code 8cc.c, theoretically, lambda-8cc can compile its own C source code as well. Therefore, lambda-8cc is theoretically a self-hosting C compiler. However, on currently existing lambda calculus interpreters, the RAM usage explodes for such large programs. It would be exciting to have a lambda calculus interpreter that runs lambda-8cc in a practical time and memory.
+Since 8cc can compile its own source code 8cc.c, theoretically, lambda-8cc can compile its own C source code as well.
+Therefore, lambda-8cc is theoretically a self-hosting C compiler.
+However, on currently existing lambda calculus interpreters, the RAM usage explodes for such large programs. 
+It would be exciting to have a lambda calculus interpreter that runs lambda-8cc in a practical time and memory.
 
 
 
@@ -186,11 +251,11 @@ The running time and memory usage statistics were measured using a [lambda calcu
 Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
 The compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
 
-| Program                              | Compilation Time (8cc + elc)   | Max. Compilation RAM Usage (8cc, elc)  | x86 Binary Size         |
-|--------------------------------------|--------------------------------|----------------------------------------|-------------------------|
-| [putchar.c](./examples/putchar.c)    | 1.8 min (1.4 min + 0.4 min)    | 36 GB (36 GB, 9 GB)                    | 342 bytes               |
-| [hello.c](./examples/hello.c)        | 2.8 min (1.8 min + 1.0 min)    | 51 GB (51 GB, 27 GB)                   | 792 bytes               |
-| [echo.c](./examples/echo.c)          | 3.0 min (2.2 min + 0.8 min)    | 57 GB (57 GB, 20 GB)                   | 663 bytes               |
-| [rot13.c](./examples/rot13.c)        | 10.5 min (6.5 min + 4.0 min)   | 97 GB (97 GB, 76 GB)                   | 2,118 bytes             |
-| [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.9 min (23.8 min + 30.1 min) | 240 GB (206 GB, 240 GB)                | 5,512 bytes             |
-| [primes.c](./examples/primes.c)      | 57.3 min (25.7 min + 31.6 min) | 241 GB (200 GB, 241 GB)                | 5,500 bytes             |
+| Program                              | Compilation Time (a.s + a.out) | Max. Compilation RAM Usage (a.s, a.out) | x86 Binary Size         |
+|--------------------------------------|--------------------------------|-----------------------------------------|-------------------------|
+| [putchar.c](./examples/putchar.c)    | 1.8 min (1.5 min + 0.3 min)    | 31 GB (31 GB, 7 GB)                     | 342 bytes               |
+| [hello.c](./examples/hello.c)        | 2.4 min (1.6 min + 0.8 min)    | 42 GB (42 GB, 22 GB)                    | 802 bytes               |
+| [echo.c](./examples/echo.c)          | 2.5 min (1.8 min + 0.7 min)    | 46 GB (46 GB, 17 GB)                    | 663 bytes               |
+| [rot13.c](./examples/rot13.c)        | 7.7 min (5.0 min + 2.7 min)    | TODO GB (TODO GB, 65.6 GB)              | 2,118 bytes             |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min (22.2 min + 27.5 min) | 200 GB (177 GB, 200 GB)                 | 5,512 bytes             |
+| [primes.c](./examples/primes.c)      |  |                | 5,500 bytes             |
