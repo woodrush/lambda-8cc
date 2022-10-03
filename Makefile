@@ -13,8 +13,8 @@ LAMBDATOOLS=./build/lambda-calculus-devkit
 # ELVM
 8CC=./bin/8cc
 ELC=./bin/elc
-8CCLAM=./out/8cc.lam
-ELCLAM=./out/elc.lam
+8CCLAM=./build/8cc.lam
+ELCLAM=./build/elc.lam
 
 # Other
 SBCL=sbcl
@@ -94,11 +94,11 @@ run-a.lazy: $(LAZYK)
 #================================================================
 # Self-hosting test
 #================================================================
-out/8cc-self.s: out/8cc.c $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+out/8cc-self.s: build/8cc.c $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 
-out/elc-self.s: out/elc.c $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+out/elc-self.s: build/elc.c $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 
@@ -113,16 +113,16 @@ out/elc-self.lam: out/elc-self.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 out/lambda-8cc-self.lam: out/lambda-8cc-main.lam out/8cc-self.lam out/elc-self.lam
 	( printf '('; cat $^; printf ')'; ) > $@
 
-test-self-host: out/lambda-8cc-self.lam
-	diff out/8cc-self.s out/8cc.eir || exit 1
-	diff out/elc-self.s out/elc.eir || exit 1
-	diff out/8cc-self.lam out/8cc.lam || exit 1
-	diff out/elc-self.lam out/elc.lam || exit 1
-	diff out/lambda-8cc-self.lam lambda-8cc.lam || exit 1
+test-self-host: out/lambda-8cc-self.lam build/8cc.eir build/elc.eir $(8CCLAM) $(ELCLAM)
+	diff out/8cc-self.s build/8cc.eir || exit 1
+	diff out/elc-self.s build/elc.eir || exit 1
+	diff out/8cc-self.lam $(8CCLAM) || exit 1
+	diff out/elc-self.lam $(ELCLAM) || exit 1
+	diff out/lambda-8cc-self.lam $(LAMBDA8CC) || exit 1
 
 
 #================================================================
-# Build out/lambda-8cc-main.lam using LambdaLisp
+# Build build/lambda-8cc-main.lam using LambdaLisp
 #================================================================
 build/lambdalisp/bin/lambdalisp.blc:
 	mkdir -p build
@@ -136,7 +136,7 @@ out/lambda-8cc-main-lambdaisp.lam: out/lambda-8cc-main-src.cl build/lambdalisp/b
 	cat $@.tmp | sed -e '1s/> //' > $@
 	rm $@.tmp
 
-test-lambda-8cc-main-lambdaisp: out/lambda-8cc-main-lambdaisp.lam out/lambda-8cc-main.lam
+test-lambda-8cc-main-lambdaisp: out/lambda-8cc-main-lambdaisp.lam build/lambda-8cc-main.lam
 	diff $^ || exit 1
 
 
@@ -147,12 +147,12 @@ src/usage.cl: src/usage.txt src/compile-usage.sh
 	cd src; ./compile-usage.sh > usage.cl.tmp
 	mv src/usage.cl.tmp $@
 
-out/lambda-8cc-main.lam: src/usage.cl $(wildcard src/*.cl)
-	mkdir -p out
-	cd src; $(SBCL) --script lambda-8cc.cl > ../out/lambda-8cc-main.lam.tmp
+build/lambda-8cc-main.lam: src/usage.cl $(wildcard src/*.cl)
+	mkdir -p build
+	cd src; $(SBCL) --script lambda-8cc.cl > ../build/lambda-8cc-main.lam.tmp
 	mv $@.tmp $@
 
-$(LAMBDA8CC): out/lambda-8cc-main.lam $(8CCLAM) $(ELCLAM)
+$(LAMBDA8CC): build/lambda-8cc-main.lam $(8CCLAM) $(ELCLAM)
 	( printf '('; cat $^; printf ')'; ) > $@
 
 
@@ -172,24 +172,24 @@ elc: $(ELC)
 $(ELC): elvm-private/Makefile
 	cd elvm-private && make out/elc && cp out/elc ../bin
 
-out/8cc.c: elvm-private/Makefile
+build/8cc.c: elvm-private/Makefile
 	mkdir -p out
-	cd elvm-private && make out/8cc.c && tools/merge_c.rb out/8cc.c > ../out/8cc.c
+	cd elvm-private && make out/8cc.c && tools/merge_c.rb out/8cc.c > ../build/8cc.c
 
-out/elc.c: elvm-private/Makefile
+build/elc.c: elvm-private/Makefile
 	mkdir -p out
-	cd elvm-private && make out/elc.c && tools/merge_c.rb out/elc.c > ../out/elc.c
+	cd elvm-private && make out/elc.c && tools/merge_c.rb out/elc.c > ../build/elc.c
 
-out/8cc.eir: out/8cc.c $(8CC)
+build/8cc.eir: build/8cc.c $(8CC)
 	$(8CC) -S -o $@ $<
 
-out/elc.eir: out/elc.c $(8CC)
+build/elc.eir: build/elc.c $(8CC)
 	$(8CC) -S -o $@ $<
 
-$(8CCLAM): out/8cc.eir $(ELC)
+$(8CCLAM): build/8cc.eir $(ELC)
 	$(ELC) -lam $< > $(8CCLAM)
 
-$(ELCLAM): out/elc.eir $(ELC)
+$(ELCLAM): build/elc.eir $(ELC)
 	$(ELC) -lam $< > $(ELCLAM)
 
 
