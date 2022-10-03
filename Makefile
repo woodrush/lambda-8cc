@@ -2,7 +2,6 @@ LAMBDA8CC=lambda-8cc.lam
 
 # Binary lambda calculus interpreter
 UNIPP=./bin/uni++
-CLAMB=./bin/clamb
 
 # Tools
 ASC2BIN=./bin/asc2bin
