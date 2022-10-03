@@ -1,4 +1,5 @@
 LAMBDA8CC=lambda-8cc.lam
+LAMBDA8CCLAZY=lambda-8cc.lazy
 
 # Binary lambda calculus interpreter
 UNIPP=./bin/uni++
@@ -154,6 +155,21 @@ build/lambda-8cc-main.lam: src/usage.cl $(wildcard src/*.cl)
 
 $(LAMBDA8CC): build/lambda-8cc-main.lam $(8CCLAM) $(ELCLAM)
 	( printf '('; cat $^; printf ')'; ) > $@
+
+
+#================================================================
+# Build lambda-8cc.lazy
+#================================================================
+build/lambda-8cc-lazy.cl: src/usage.cl $(wildcard src/*.cl)
+	mkdir -p build
+	( echo '(defparameter compile-lazyk t)'; cat src/lambda-8cc.cl ) > build/lambda-8cc-lazy.cl
+
+build/lambda-8cc-main.lazy: build/lambda-8cc-lazy.cl
+	cd src; $(SBCL) --script ../build/lambda-8cc-lazy.cl > ../build/lambda-8cc-main.lazy.tmp
+	mv $@.tmp $@
+
+$(LAMBDA8CCLAZY): build/lambda-8cc-main.lazy $(8CCLAM) $(ELCLAM)
+	( printf '``'; cat $^; ) > $@
 
 
 #================================================================
