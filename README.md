@@ -1,6 +1,6 @@
 # lambda-8cc: x86 C Compiler Written in Untyped Lambda Calculus
 lambda-8cc is a C compiler written as a monolithic closed untyped lambda calculus term.
-The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.zip](./bin/lambda-8cc.zip).
+The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip).
 
 lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by [Rui Ueyama](https://github.com/rui314) to lambda calculus, written in C.
 To run C on lambda calculus, I first made another project [LambdaVM](https://github.com/woodrush/lambdavm),
@@ -17,15 +17,30 @@ Compilation from C to ELVM assembly is done using ELVM's lambda calculus backend
 
 
 ## Overview
-lambda-8cc is a closed untyped lambda calculus term `lambda-8cc = \x. ...` which takes a C program written as a string as an input and outputs a x86 executable expressed as a list of bytes. Characters and bytes are encoded as a list of bits with `0 = \x.\y.x`, `1 = \x.\y.y`,
-and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with `cons = \x.\y.\f.(f x y)`, `nil = \x.\y.y`, so the entire computation consists solely of the beta-reduction of closed lambda terms, without the need of introducing any non-lambda type object whatsoever.
-Therefore, _everything_ in the computation process, even including integers, is expressed as pure lambda terms.
+lambda-8cc is a closed untyped lambda calculus term `lambda-8cc = \x. ...` which takes a C program written as a string as an input and outputs a x86 executable expressed as a list of bytes.
+Characters and bytes are encoded as a list of bits with `0 = \x.\y.x`, `1 = \x.\y.y`,
+and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with `cons = \x.\y.\f.(f x y)`, `nil = \x.\y.y`.
 
-Further details on handling I/O and writing programs in lambda calculus are described in the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp), a Lisp interpreter written as an untyped lambda calculus term.
+Therefore, _everything_ in the computation process, even including integers, is expressed as pure lambda terms,
+without the need of introducing any non-lambda type object whatsoever.
+lambda-8cc makes [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#%CE%B2-reduction) the sole requirement for compiling C to x86.
+Note that the process doesn't depend on the choice of variable names as well.
+Instead of encoding the character `A` as a variable with the name `A`, it is encoded as a list of bits of its ASCII encoding `01000001`.
+
+The nice thing about lambda calculus is that the language specs are extremely simple.
+With lambda-8cc, in a way we are preserving knowledge about how to compile C in a timeless method.
+Even if humanity loses knowledge about the x86 instruction set,
+as long as we remember the rules for lambda calculus and have the lambda term for lambda-8cc,
+we can still use the entire C language through lambda-8cc and build everything on top of it again.
+
+For further details on how I/O is handled and how programs are written in lambda calculus,
+please see the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
+a Lisp interpreter written as an untyped lambda calculus term.
 
 
 ## Example
-Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard input to/from the [ROT13](https://en.wikipedia.org/wiki/ROT13) encoding:
+Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard input to/from the [ROT13](https://en.wikipedia.org/wiki/ROT13) encoding.
+It compiles without errors using gcc:
 
 ```c
 #define EOF -1
@@ -55,7 +70,7 @@ int main (void) {
 }
 ```
 
-This program can be compiled by lambda-8cc out of the box as follows:
+The same program can be compiled by lambda-8cc out of the box as follows:
 
 ```sh
 $ cat lambda-8cc.Blc examples/rot13.c | bin/uni++ -o > a.out
@@ -66,11 +81,18 @@ Uryyb, jbeyq!
 ```
 
 Here, uni++ is a very fast [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
-This takes about 8 minutes to compile using 65 GB of RAM.
-Smaller programs such as [putchar.c](./examples/putchar.c) can be compiled in 2 minutes using 31 GB of RAM.
-More detailed stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
+This takes about 8 minutes to run on my machine.
+Detailed usage instructions are available in the [Usage](#usage) section.
+Running time stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 
-lambda-8cc.Blc is lambda-8cc.lam written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation, made as follows:
+<!-- This takes about 8 minutes to compile using about a whopping 120 GB of RAM.
+If you have a free HDD or USB drive, you can use a [swap file](https://askubuntu.com/questions/178712/how-to-increase-swap-space)
+to dynamically extend your swap region without changing the partition settings for running lambda-8cc.
+I suspect that the RAM usage can probably be improved by introducing mark-and-sweep garbage collection in the interpreter.
+The RAM usage can be halved to 65 GB by separately compiling the assembly `a.s` and the x86 executable `a.out` as described in the [Usage](#usage) section.
+Smaller programs such as [putchar.c](./examples/putchar.c) can be compiled in 2 minutes using 31 GB of RAM. -->
+
+lambda-8cc.Blc is lambda-8cc.lam ([./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip)) written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation, made as follows:
 
 ```sh
 $ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc
@@ -84,7 +106,54 @@ I've written details on the BLC notation in my [blog post](https://woodrush.gith
 
 [asc2bin](https://github.com/woodrush/lambda-calculus-devkit/blob/main/src/asc2bin.c) is a utility that packs the 0/1 ASCII bitstream to a byte stream.
 Using this tool, the encoding `0010` for `\x.x` becomes only half a byte.
-uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
+The interpreter uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
+
+
+## Features
+Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus itself.
+Compiled lambda calculus terms run on the same lambda calculus interpreter used to run lambda-8cc.
+
+Here is a full list of features supported by lambda-8cc:
+
+- Compile C to a x86 executable (a.out)
+- Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
+- Compile C to a [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (executable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
+- Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
+- Compile ELVM assembly to x86/lambda calculus/SKI combinator calculus
+
+lambda-8cc being written in lambda calculus, naturally, its compiler options are written in lambda calculus terms as well.
+The behavior of the lambda term `lambda-8cc` can be changed by applying a compiler option as `(lambda-8cc option)` beforehand of the input.
+Here are the options:
+
+| Input         | Output                          | Compiler Option                                                                                                      |
+|---------------|---------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| C             | x86 executable                  | $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.x) ~ (\lambda x.x))$ |
+| C             | Plaintext lambda calculus term  | $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.y) ~ (\lambda x.x))$ |
+| C             | Binary lambda calculus notation | $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.z) ~ (\lambda x.x))$ |
+| C             | SKI combinator calculus         | $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.a) ~ (\lambda x.x))$ |
+| C             | ELVM assembly                   | $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.b) ~ (\lambda x.x))$ |
+| ELVM assembly | x86 executable                  | $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.x) ~ (\lambda x.x))$ |
+| ELVM assembly | Plaintext lambda calculus term  | $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.y) ~ (\lambda x.x))$ |
+| ELVM assembly | Binary lambda calculus notation | $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.z) ~ (\lambda x.x))$ |
+| ELVM assembly | SKI combinator calculus         | $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.a) ~ (\lambda x.x))$ |
+
+<!-- 
+- $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.x) ~ (\lambda x.x))$ : C to x86 (defualt)
+- $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.y) ~ (\lambda x.x))$ : C to lambda calculus
+- $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.z) ~ (\lambda x.x))$ : C to binary lambda calculus notation
+- $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.a) ~ (\lambda x.x))$ : C to SKI combinator calculus
+- $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.b) ~ (\lambda x.x))$ : C to ELVM assembly
+- $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.x) ~ (\lambda x.x))$ : ELVM assembly to x86
+- $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.y) ~ (\lambda x.x))$ : ELVM assembly to lambda calculus
+- $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.z) ~ (\lambda x.x))$ : ELVM assembly to binary lambda calculus notation
+- $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.a) ~ (\lambda x.x))$ : ELVM assembly to SKI combinator calculus -->
+
+Not only can lambda-8cc compile C to x86, it can compile C to a standalone lambda calculus term that runs on a lambda calculus interpreter.
+This makes lambda-8cc self-contained in the realm of lambda calculus.
+Compiled lambda terms run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by Justine Tunney,
+and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by John Tromp (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
+lambda-8cc itself should run on these interpreters as well, but currently it takes a lot of time.
+
 
 
 ## Running Times and Memory Usage
@@ -100,14 +169,13 @@ The following table shows the compilation time and memory usage on [Melvin Zhang
 | [fizzbuzz.c](./examples/fizzbuzz.c)  | 53.9 min         | 240 GB                              | 5,512 bytes             | Prints FizzBuzz sequence up to 30                                            |
 | [primes.c](./examples/primes.c)      | 57.3 min         | 241 GB                              | 5,500 bytes             | Prints primes up to 100                                                      |
 
-To compile programs that require a lot of memory, you can extend your swap region by using a swap file.
+To compile programs that require a lot of memory, you can extend your swap region without changing the partition settings by using a swap file.
 If you run Linux and have any storage device such as a HDD or USB drive,
 you can use that storage to easily and dynamically extend your swap region using `mkswap` and `swapon`.
 The stats on this table are ran with an extended swap region this way.
 Instructions are explained in this [askubuntu thread](https://askubuntu.com/questions/178712/how-to-increase-swap-space).
 
-Note that these are the compilation times.
-The running times for the compiled x86 binary are instantaneous.
+Note that these are the compilation times - the running times for the compiled x86 binary are instantaneous.
 This even holds when compiling to lambda calculus terms.
 Compiled lambda terms also run instantaneously and only use a few gigabytes of memory when run on a lambda calculus interpreter.
 
@@ -116,30 +184,6 @@ The compilations for these stats were run on an Ubuntu 22.04.1 machine with 48 G
 The running time shown here is the wall clock running time including memory operations.
 For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
 
-
-
-## Features
-lambda-8cc has the following features:
-
-- Compile C to a x86 executable (a.out)
-- Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
-- Compile C to a [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (executable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
-- Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
-- Compile ELVM assembly to x86/lambda calculus/SKI combinator calculus
-
-These features can be used by passing a compiler option (expressed as a lambda term) to lambda-8cc.
-
-The nice thing about lambda calculus is that the language specs are extremely simple.
-Thus in a way we are preserving knowledge about how to compile C in a timeless method using lambda calculus.
-Even if humanity loses knowledge about the x86 instruction set,
-as long as we remember the rules for lambda calculus and have the lambda term for lambda-8cc,
-we can still use the entire C language through lambda-8cc and build everything on top of it again.
-
-Not only can lambda-8cc compile C to x86, it can compile C to a standalone lambda calculus term that runs on a lambda calculus interpreter.
-This makes lambda-8cc self-contained in the realm of lambda calculus.
-Compiled lambda terms run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by Justine Tunney,
-and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by John Tromp (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
-lambda-8cc itself should run on these interpreters as well, but currently it takes a lot of time.
 
 
 ## Dependent Projects
@@ -256,6 +300,6 @@ The compilation time and memory usage on [Melvin Zhang](https://github.com/melvi
 | [putchar.c](./examples/putchar.c)    | 1.8 min (1.5 min + 0.3 min)    | 31 GB (31 GB, 7 GB)                     | 342 bytes               |
 | [hello.c](./examples/hello.c)        | 2.4 min (1.6 min + 0.8 min)    | 42 GB (42 GB, 22 GB)                    | 802 bytes               |
 | [echo.c](./examples/echo.c)          | 2.5 min (1.8 min + 0.7 min)    | 46 GB (46 GB, 17 GB)                    | 663 bytes               |
-| [rot13.c](./examples/rot13.c)        | 7.7 min (5.0 min + 2.7 min)    | TODO GB (TODO GB, 65.6 GB)              | 2,118 bytes             |
+| [rot13.c](./examples/rot13.c)        | 7.7 min (5.0 min + 2.7 min)    | TODO GB (TODO GB, 65 GB)                | 2,118 bytes             |
 | [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min (22.2 min + 27.5 min) | 200 GB (177 GB, 200 GB)                 | 5,512 bytes             |
-| [primes.c](./examples/primes.c)      |  |                | 5,500 bytes             |
+| [primes.c](./examples/primes.c)      | 53.0 min (24.0 min + 29.0 min) | (172 GB, ? GB)                          | 5,500 bytes             |
