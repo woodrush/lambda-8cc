@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-printf '(def-lazy usage (string-concatenator nil ';
+printf '(def-lazy usage-base (string-concatenator nil ';
 
 cat usage.txt \
 | tr "\n" "N" \

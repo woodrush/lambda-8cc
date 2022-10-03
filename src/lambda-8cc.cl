@@ -51,6 +51,17 @@
     (t
       (string-concatenator (cons x curstr)))))
 
+(def-lazy usage
+  (do
+    (let* t t)
+    (let* nil nil)
+    (let* p-t-nil p-t-nil)
+    (let* p-t-t p-t-t)
+    (let* p-nil-nil p-nil-nil)
+    (let* p-nil-t p-nil-t)
+    (let* alphabet-prefix-t alphabet-prefix-t)
+    (let* alphabet-prefix-nil alphabet-prefix-nil)
+    usage-base))
 
 (defun-lazy main (8cc elc maybe-stdin)
   (do
