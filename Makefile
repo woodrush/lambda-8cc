@@ -49,6 +49,9 @@ a.out-onepass: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( cat $(LAMBDA8CC) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
 	chmod 755 a.out
 
+$(INPUT):
+	cp examples/hello.c $@
+
 
 #================================================================
 # Other output languages
