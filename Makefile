@@ -20,8 +20,10 @@ ELCLAM=./out/elc.lam
 SBCL=sbcl
 LAZYK=./bin/lazyk
 
+# Input C file
 INPUT=input.c
 
+# lambda-8cc compilation options
 OPT_C_TO_LAM  ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.y) (\\x.x)))'
 OPT_C_TO_BLC  ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.z) (\\x.x)))'
 OPT_C_TO_LAZY ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))'
