@@ -17,54 +17,77 @@ ELCLAM=./elc.lam
 
 # Other
 SBCL=sbcl
+LAZYK=./bin/lazyk
 
 INPUT=input.c
 
-all: x86
+OPT_C_TO_S    ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.b) (\\x.x)))'
+OPT_C_TO_LAM  ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.y) (\\x.x)))'
+OPT_C_TO_BLC  ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.z) (\\x.x)))'
+OPT_C_TO_LAZY ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))'
+OPT_S_TO_X86  ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.x) (\\x.x)))'
+OPT_S_TO_LAM  ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.y) (\\x.x)))'
+OPT_S_TO_BLC  ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.z) (\\x.x)))'
+OPT_S_TO_LAZY ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))'
 
+
+all: x86
 x86: a.out
-lam: a.lam
+
+a.s: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+a.out: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_X86) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+	chmod 755 a.out
 
 x86-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( cat lambda-8cc.lam | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
 	chmod 755 a.out
 
-a.s: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.b) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.s.tmp
-	mv a.s.tmp a.s
 
-a.out: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.x) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out.tmp
-	mv a.out.tmp a.out
-	chmod 755 a.out
+#================================================================
+# Other output languages
+#================================================================
+a.lam: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
 
-a.lam: a.s elc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( cat elc.lam | $(LAM2BIN) | $(ASC2BIN); echo "lam"; cat a.s ) | /usr/bin/time -v $(UNIPP) -o > a.lam.tmp
+a.blc: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_BLC) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+a.lazy: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+lam-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
+	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.lam.tmp
 	mv a.lam.tmp a.lam
+
+blc-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
+	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_BLC) ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.blc.tmp
+	mv a.blc.tmp a.blc
+
+lazy-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
+	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.lazy.tmp
+	mv a.lazy.tmp a.lazy
+
 
 run-a.lam: $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	cat a.lam | $(LAM2BIN) | $(ASC2BIN) | $(UNIPP) -o
 
-lam-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.y) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.lam.tmp
-	mv a.lam.tmp a.lam
+run-a.blc: $(ASC2BIN) $(UNIPP)
+	cat a.blc | $(ASC2BIN) | $(UNIPP) -o
 
-blc-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.z) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.blc.tmp
-	mv a.blc.tmp a.blc
-
-lazy-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.lazy.tmp
-	mv a.lazy.tmp a.lazy
-
-s-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.b) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.s.tmp
-	mv a.s.tmp a.s
-
+run-a.lazy: $(LAZYK)
+	$(LAZYK) -u a.lazy
 
 
 #================================================================
-# Build the one-pass compiler
+# Build lambda-8cc.lam
 #================================================================
 out/lambda-8cc-wrapper.lam: src/lambda-8cc.cl src/lambdacraft.cl
 	mkdir -p out
@@ -135,3 +158,9 @@ lam2bin: $(LAM2BIN)
 $(LAM2BIN): $(LAMBDATOOLS)
 	mkdir -p bin
 	cd $(LAMBDATOOLS) && make lam2bin && mv bin/lam2bin ../../bin
+
+.PHONY: lazyk
+lazyk: $(LAZYK)
+$(LAZYK): $(LAMBDATOOLS)
+	mkdir -p bin
+	cd $(LAMBDATOOLS) && make lazyk && mv bin/lazyk ../../bin
