@@ -1,4 +1,6 @@
 (load "./lambdacraft.cl")
+(load "./blc-numbers.cl")
+(load "./usage.cl")
 
 
 (defrec-lazy append (l1 l2)
@@ -39,8 +41,16 @@
 (defun-lazy iscons3 (expr)
   (expr
     (lambda (a b c) (lambda (x) (if (isnil x) nil (lambda (x) t))))
-    (cons (lambda (x) x) (lambda (x) x))
+    (cons (lambda (x) x) nil)
     nil))
+
+(defrec-lazy string-concatenator (curstr x)
+  (cond
+    ((isnil x)
+      curstr)
+    (t
+      (string-concatenator (cons x curstr)))))
+
 
 (defun-lazy main (8cc elc maybe-stdin)
   (do
@@ -62,11 +72,15 @@
     (if-then-return (iscons3 maybe-stdin)
       (lambda (stdin)
         (do
+          (if-then-return (isnil stdin)
+            usage)
           (<- (opt-input opt-output _) (maybe-stdin))
           (let* input-to-eir (opt-input 8cc (lambda (x) x)))
           (let* opt (opt-output opt-x86 opt-lam opt-blc opt-lazy nil))
           (let* eir-to-out (if (isnil opt) (lambda (x) x) (lambda (s) (elc (append opt s)))))
           (eir-to-out (input-to-eir stdin)))))
+    (if-then-return (isnil maybe-stdin)
+      usage)
     (elc (append opt-x86 (8cc maybe-stdin)))))
 
 

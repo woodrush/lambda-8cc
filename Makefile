@@ -89,12 +89,15 @@ run-a.lazy: $(LAZYK)
 #================================================================
 # Build lambda-8cc.lam
 #================================================================
-out/lambda-8cc-wrapper.lam: src/lambda-8cc.cl src/lambdacraft.cl
-	mkdir -p out
-	cd src; $(SBCL) --script lambda-8cc.cl > ../out/lambda-8cc-wrapper.lam
+src/usage.cl: src/usage.txt
+	cd src; ./compile-usage.sh > usage.cl
 
-lambda-8cc.lam: out/lambda-8cc-wrapper.lam 8cc.lam elc.lam
-	( printf '('; cat out/lambda-8cc-wrapper.lam 8cc.lam elc.lam; printf ')'; ) > lambda-8cc.lam
+out/lambda-8cc-main.lam: src/lambda-8cc.cl src/lambdacraft.cl src/blc-numbers.cl src/usage.cl
+	mkdir -p out
+	cd src; $(SBCL) --script lambda-8cc.cl > ../out/lambda-8cc-main.lam
+
+lambda-8cc.lam: out/lambda-8cc-main.lam 8cc.lam elc.lam
+	( printf '('; cat out/lambda-8cc-main.lam 8cc.lam elc.lam; printf ')'; ) > lambda-8cc.lam
 
 
 #================================================================

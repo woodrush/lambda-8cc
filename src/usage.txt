@@ -1,0 +1,15 @@
+Usage:
+    apply lambda-8cc.lam [input-file]
+    apply lambda-8cc.lam [option] [input-file]
+
+Options:
+    (\f.(f [input] [output] (\x.x)))
+    (\f.(f (\x.\y.x) (\x.\y.\z.\a.\b.x) (\x.x))) : C to x86 (defualt)
+    (\f.(f (\x.\y.x) (\x.\y.\z.\a.\b.y) (\x.x))) : C to *.lam (plaintext lambda calculus program)
+    (\f.(f (\x.\y.x) (\x.\y.\z.\a.\b.z) (\x.x))) : C to *.blc (binary lambda calculus program)
+    (\f.(f (\x.\y.x) (\x.\y.\z.\a.\b.a) (\x.x))) : C to *.lazy (SKI combinator calculus, as a Lazy K program)
+    (\f.(f (\x.\y.x) (\x.\y.\z.\a.\b.b) (\x.x))) : C to ELVM assembly
+    (\f.(f (\x.\y.y) (\x.\y.\z.\a.\b.x) (\x.x))) : ELVM assembly to x86
+    (\f.(f (\x.\y.y) (\x.\y.\z.\a.\b.y) (\x.x))) : ELVM assembly to *.lam
+    (\f.(f (\x.\y.y) (\x.\y.\z.\a.\b.z) (\x.x))) : ELVM assembly to *.blc
+    (\f.(f (\x.\y.y) (\x.\y.\z.\a.\b.a) (\x.x))) : ELVM assembly to *.lazy
