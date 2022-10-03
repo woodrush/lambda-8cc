@@ -25,12 +25,16 @@ all: x86
 x86: a.out
 lam: a.lam
 
-a.s: 8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( cat 8cc.lam | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | /usr/bin/time -v $(UNIPP) -o > a.s.tmp
+x86-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( cat lambda-8cc.lam | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
+	chmod 755 a.out
+
+a.s: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.b) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.s.tmp
 	mv a.s.tmp a.s
 
-a.out: a.s elc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( cat elc.lam | $(LAM2BIN) | $(ASC2BIN); echo "x86"; cat a.s ) | /usr/bin/time -v $(UNIPP) -o > a.out.tmp
+a.out: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.x) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out.tmp
 	mv a.out.tmp a.out
 	chmod 755 a.out
 
@@ -40,10 +44,6 @@ a.lam: a.s elc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 
 run-a.lam: $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	cat a.lam | $(LAM2BIN) | $(ASC2BIN) | $(UNIPP) -o
-
-x86-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
-	( cat lambda-8cc.lam | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.out
-	chmod 755 a.out
 
 lam-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
 	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.y) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.lam.tmp
