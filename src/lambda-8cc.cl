@@ -15,6 +15,33 @@
 (defun-lazy istrue (expr)
   (expr (lambda (p q) t) (lambda (x) x) (lambda (x) x) nil))
 
+(defrec-lazy sanitize-char (c cont)
+  (typematch-nil-cons c (b bit-cdr)
+    ;; nil case
+    (cont nil)
+    ;; cons case
+    (do
+      (<- (bit-cdr) (sanitize-char bit-cdr))
+      (if b
+        (cont (cons t bit-cdr))
+        (cont (cons nil bit-cdr))))))
+
+(defrec-lazy sanitize-str (s cont)
+  (typematch-nil-cons s (c cdr-s)
+    ;; nil case
+    (cont nil)
+    ;; cons case
+    (do
+      (<- (c) (sanitize-char c))
+      (<- (str) (sanitize-str cdr-s))
+      (cont (cons c str)))))
+
+(defun-lazy iscons3 (expr)
+  (expr
+    (lambda (a b c) (lambda (x) (if (isnil x) nil (lambda (x) t)))
+    (cons (lambda (x) x) (lambda (x) x))
+    nil)))
+
 (defun-lazy main (8cc elc maybe-stdin)
   (do
     (let* "\\n"    (do (b0) (b0) (b0) (b0) (b1) (b0) (b1) (b0) nil))
@@ -29,11 +56,14 @@
     (let* opt-lam    (list "l" "a" "m" "\\n"))
     (let* opt-lazy   (list "l" "a" "z" "y" "\\n"))
     (let* opt-x86    (list "x" "8" "6" "\\n"))
-    (if-then-return (istrue maybe-stdin)
-      (lambda (opt stdin)
+    (if-then-return (iscons3 maybe-stdin)
+      (lambda (stdin)
         (do
-          (<- (o1 o2 o3) (opt))
-          (elc (append opt-x86 (8cc stdin))))))
+          (<- (opt-input opt-output) (maybe-stdin))
+          (<- (input-to-eir) (opt-input 8cc (lambda (x) x)))
+          (<- (opt) (opt-output opt-x86 opt-lam opt-lazy nil))
+          (let* eir-to-out (if (isnil opt) (lambda (x) x) (lambda (s) (elc (append opt s)))))
+          (eir-to-out (input-to-eir stdin)))))
     (elc (append opt-x86 (8cc maybe-stdin)))))
 
 
