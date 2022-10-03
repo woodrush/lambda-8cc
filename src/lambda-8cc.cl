@@ -110,6 +110,6 @@
 
 (cond
   ((boundp 'compile-lazyk)
-    (format t (compile-to-ski-lazy (blcstr-to-lazykstr main))))
+    (format t (compile-to-lam-lazy (blcstr-to-lazykstr main))))
   (t
     (format t (compile-to-lam-lazy main))))

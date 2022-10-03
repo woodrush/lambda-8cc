@@ -20,6 +20,8 @@ ELCLAM=./build/elc.lam
 # Other
 SBCL=sbcl
 LAZYK=./bin/lazyk
+BLCAIT=./bin/blc-ait
+BCL2SKI=./bin/bcl2ski
 
 # Input C file
 INPUT=input.c
@@ -164,11 +166,18 @@ build/lambda-8cc-lazy.cl: src/usage.cl $(wildcard src/*.cl)
 	mkdir -p build
 	( echo '(defparameter compile-lazyk t)'; cat src/lambda-8cc.cl ) > build/lambda-8cc-lazy.cl
 
-build/lambda-8cc-main.lazy: build/lambda-8cc-lazy.cl
-	cd src; $(SBCL) --script ../build/lambda-8cc-lazy.cl > ../build/lambda-8cc-main.lazy.tmp
+build/lambda-8cc-main.lazy: build/lambda-8cc-lazy.cl $(BLCAIT) $(BCL2SKI)
+	cd src; $(SBCL) --script ../build/lambda-8cc-lazy.cl > ../build/lambda-8cc-main-lazy.lam
+	$(BLCAIT) bcl build/lambda-8cc-main-lazy.lam | $(BCL2SKI) > $@.tmp
 	mv $@.tmp $@
 
-$(LAMBDA8CCLAZY): build/lambda-8cc-main.lazy $(8CCLAM) $(ELCLAM)
+$(8CCLAM).lazy: build/8cc.eir $(ELC)
+	$(ELC) -lazy $< > $@
+
+$(ELCLAM).lazy: build/elc.eir $(ELC)
+	$(ELC) -lazy $< > $@
+
+$(LAMBDA8CCLAZY): build/lambda-8cc-main.lazy $(8CCLAM).lazy $(ELCLAM).lazy
 	( printf '``'; cat $^; ) > $@
 
 
@@ -203,10 +212,10 @@ build/elc.eir: build/elc.c $(8CC)
 	$(8CC) -S -o $@ $<
 
 $(8CCLAM): build/8cc.eir $(ELC)
-	$(ELC) -lam $< > $(8CCLAM)
+	$(ELC) -lam $< > $@
 
 $(ELCLAM): build/elc.eir $(ELC)
-	$(ELC) -lam $< > $(ELCLAM)
+	$(ELC) -lam $< > $@
 
 
 #================================================================
@@ -239,3 +248,15 @@ lazyk: $(LAZYK)
 $(LAZYK): $(LAMBDATOOLS)
 	mkdir -p bin
 	cd $(LAMBDATOOLS) && make lazyk && mv bin/lazyk ../../bin
+
+.PHONY: blc-ait
+blc-ait: $(BLCAIT)
+$(BLCAIT): $(LAMBDATOOLS)
+	mkdir -p bin
+	cd $(LAMBDATOOLS) && make blc-ait && mv bin/blc-ait ../../bin
+
+.PHONY: bcl2ski
+bcl2ski: $(BCL2SKI)
+$(BCL2SKI): $(LAMBDATOOLS)
+	mkdir -p bin
+	cd $(LAMBDATOOLS) && make bcl2ski && mv bin/bcl2ski ../../bin
