@@ -281,7 +281,7 @@ are released under the MIT license. See the LICENSE in each location for details
 ```
 
 
-## Run in Lazy K
+## Running on Lazy K
 lambda-8cc is also available in [Lazy K](https://tromp.github.io/cl/lazy-k.html), a language based on the [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus).
 For further details, please see [details.md](details.md).
 

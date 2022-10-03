@@ -70,15 +70,14 @@ lambda-8cc.lam can be built from source by simply running:
 make lambda-8cc.lam
 ```
 
-The build flow is approximately as follows:
-
-- In the ELVM submodule
-- Build 8cc and elc in ELVM
-- Build `build/8cc.c` and `build/elc.c` 
-
 
 ## Self-Hosting Test
-The following Make rule runs the self-hosting test for lambda-8cc:
+When running `make lambda-8cc.lam`, the source files `build/8cc.c` and `build/elc.c` are created.
+These are the files that are used to create `build/8cc.lam` and `build/elc.lam` which are linked to create `lambda-8cc.lam`.
+Since the files `build/8cc.c` and `build/elc.c` are compilable by the x86-64 versions of 8cc and elc,
+which is lambda-8cc itself, lambda-8cc.lam should be able to compile these C sources as well.
+
+The following Make rule does this exact thing:
 
 ```sh
 make test-self-host
@@ -87,3 +86,6 @@ make test-self-host
 This compiles 8cc.c and elc.c, the source codes for [8cc](https://github.com/rui314/8cc) and [elc](https://github.com/shinh/elvm/blob/master/target/elc.c) (a part of [ELVM](https://github.com/shinh/elvm)) using lambda-8cc, and compares its outputs with the results compiled by the x86-64 versions of 8cc and elc.
 As mentioned in [README.md](README.md), since this takes a lot of time and memory, this test is still yet unconfirmed.
 
+
+## Running on Lazy K
+lambda-8cc is also available in [Lazy K](https://tromp.github.io/cl/lazy-k.html), a language based on the [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus).
