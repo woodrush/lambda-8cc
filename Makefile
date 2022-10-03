@@ -122,6 +122,25 @@ test-self-host: out/lambda-8cc-self.lam
 
 
 #================================================================
+# Build out/lambda-8cc-main.lam using LambdaLisp
+#================================================================
+build/lambdalisp/bin/lambdalisp.blc:
+	mkdir -p build
+	cd build; git clone https://github.com/woodrush/lambdalisp
+
+out/lambda-8cc-main-src.cl: src/lambdacraft.cl src/blc-numbers.cl src/usage.cl src/lambda-8cc.cl
+	cat $^ > $@
+
+out/lambda-8cc-main-lambdaisp.lam: out/lambda-8cc-main-src.cl build/lambdalisp/bin/lambdalisp.blc $(ASC2BIN) $(UNIPP)
+	( cat build/lambdalisp/bin/lambdalisp.blc | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	cat $@.tmp | sed -e '1s/> //' > $@
+	rm $@.tmp
+
+test-lambda-8cc-main-lambdaisp: out/lambda-8cc-main-lambdaisp.lam out/lambda-8cc-main.lam
+	diff $^ || exit 1
+
+
+#================================================================
 # Build lambda-8cc.lam
 #================================================================
 src/usage.cl: src/usage.txt src/compile-usage.sh
