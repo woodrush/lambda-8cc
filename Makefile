@@ -21,18 +21,17 @@ LAZYK=./bin/lazyk
 
 INPUT=input.c
 
-OPT_C_TO_S    ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.b) (\\x.x)))'
 OPT_C_TO_LAM  ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.y) (\\x.x)))'
 OPT_C_TO_BLC  ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.z) (\\x.x)))'
 OPT_C_TO_LAZY ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))'
+OPT_C_TO_S    ='(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.b) (\\x.x)))'
 OPT_S_TO_X86  ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.x) (\\x.x)))'
 OPT_S_TO_LAM  ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.y) (\\x.x)))'
 OPT_S_TO_BLC  ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.z) (\\x.x)))'
 OPT_S_TO_LAZY ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))'
 
 
-all: x86
-x86: a.out
+all: a.out
 
 a.s: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
