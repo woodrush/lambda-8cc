@@ -56,12 +56,12 @@
   (do
     (let* t t)
     (let* nil nil)
+    (let* alphabet-prefix-t alphabet-prefix-t)
+    (let* alphabet-prefix-nil alphabet-prefix-nil)
     (let* p-t-nil p-t-nil)
     (let* p-t-t p-t-t)
     (let* p-nil-nil p-nil-nil)
     (let* p-nil-t p-nil-t)
-    (let* alphabet-prefix-t alphabet-prefix-t)
-    (let* alphabet-prefix-nil alphabet-prefix-nil)
     usage-base))
 
 (defmacro def-main ()
@@ -82,6 +82,7 @@
       (let* opt-lam    (list "l" "a" "m" "\\n"))
       (let* opt-blc    (list "b" "l" "c" "\\n"))
       (let* opt-lazy   (list "l" "a" "z" "y" "\\n"))
+      (let* usage usage)
       (if-then-return (iscons3 maybe-stdin)
         (lambda (stdin)
           (do
