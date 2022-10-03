@@ -38,9 +38,9 @@
 
 (defun-lazy iscons3 (expr)
   (expr
-    (lambda (a b c) (lambda (x) (if (isnil x) nil (lambda (x) t)))
+    (lambda (a b c) (lambda (x) (if (isnil x) nil (lambda (x) t))))
     (cons (lambda (x) x) (lambda (x) x))
-    nil)))
+    nil))
 
 (defun-lazy main (8cc elc maybe-stdin)
   (do
@@ -59,9 +59,9 @@
     (if-then-return (iscons3 maybe-stdin)
       (lambda (stdin)
         (do
-          (<- (opt-input opt-output) (maybe-stdin))
-          (<- (input-to-eir) (opt-input 8cc (lambda (x) x)))
-          (<- (opt) (opt-output opt-x86 opt-lam opt-lazy nil))
+          (<- (opt-input opt-output _) (maybe-stdin))
+          (let* input-to-eir (opt-input 8cc (lambda (x) x)))
+          (let* opt (opt-output opt-x86 opt-lam opt-lazy nil))
           (let* eir-to-out (if (isnil opt) (lambda (x) x) (lambda (s) (elc (append opt s)))))
           (eir-to-out (input-to-eir stdin)))))
     (elc (append opt-x86 (8cc maybe-stdin)))))
