@@ -55,7 +55,7 @@ blc-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
 
 lazy-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
 	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.lazy.tmp
-	mv a.lazy.tmp a.lam
+	mv a.lazy.tmp a.lazy
 
 s-onepass: lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP) $(INPUT)
 	( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.b) (\\x.x)))' ) | $(LAM2BIN) | $(ASC2BIN); cat $(INPUT) ) | $(UNIPP) -o > a.s.tmp
