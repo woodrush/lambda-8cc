@@ -21,6 +21,7 @@
 ;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;; SOFTWARE.
 ;;===============================================================================
+(defparameter **lambdalisp-suppress-repl** t)
 (defparameter profile-index-depth nil)
 (defparameter lambdacraft-loaded t)
 
@@ -402,25 +403,25 @@
               (lookup env body))
             ((not (islambda body))
               (format nil
-                "(~a ~a)"
-                (let ((s (funcall compiler (car body) env)))
-                  (if (and (not (atom (car body))) (not (islambda (car body))))
-                    (subseq s 1 (- (length s) 1))
-                    s))
+                (cond
+                  ((atom (car body))
+                    app-format-var)
+                  ((islambda (car body))
+                    app-format-app)
+                  (t
+                    app-format-var))
+                (funcall compiler (car body) env)
                 (funcall compiler (car (cdr body)) env)))
             (t
               (format nil abs-format
                 (lookup (cons (lambdaarg-top body) env) (lambdaarg-top body))
-                (let ((s (funcall compiler (lambdabody body) (cons (lambdaarg-top body) env))))
-                  (if (islambda (lambdabody body))
-                    (subseq s 1 (- (length s) 1))
-                    s))))))))))
+                (funcall compiler (lambdabody body) (cons (lambdaarg-top body) env))))))))))
 
 (defparameter to-plaintext-lambda* (lambda-compiler-builder "(~a ~a)" "((~a) ~a)" "\\~a.~a"))
 (defun to-plaintext-lambda (&rest args)
   (apply to-plaintext-lambda* args))
 
-(defparameter to-lam* (lambda-compiler-builder "(~a ~a)" "(~a ~a)" "(\\~a.~a)"))
+(defparameter to-lam* (lambda-compiler-builder "((~a) (~a))" "((~a) (~a))" "(\\~a.~a)"))
 (defun to-lam (&rest args)
   (apply to-lam* args))
 

@@ -63,7 +63,7 @@
     (let* alphabet-prefix-nil alphabet-prefix-nil)
     usage-base))
 
-(defun-lazy main (8cc elc maybe-stdin)
+(defun-lazy main (eightcc elc maybe-stdin)
   (do
     (let* "\\n"    (do (b0) (b0) (b0) (b0) (b1) (b0) (b1) (b0) nil))
     (let* "6"      (do (b0) (b0) (b1) (b1) (b0) (b1) (b1) (b0) nil))
@@ -86,13 +86,13 @@
           (if-then-return (isnil stdin)
             usage)
           (<- (opt-input opt-output _) (maybe-stdin))
-          (let* input-to-eir (opt-input 8cc (lambda (x) x)))
+          (let* input-to-eir (opt-input eightcc (lambda (x) x)))
           (let* opt (opt-output opt-x86 opt-lam opt-blc opt-lazy nil))
           (let* eir-to-out (if (isnil opt) (lambda (x) x) (lambda (s) (elc (append opt s)))))
           (eir-to-out (input-to-eir stdin)))))
     (if-then-return (isnil maybe-stdin)
       usage)
-    (elc (append opt-x86 (8cc maybe-stdin)))))
+    (elc (append opt-x86 (eightcc maybe-stdin)))))
 
 
 (format t (compile-to-lam-lazy main))
