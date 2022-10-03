@@ -14,8 +14,8 @@ LAMBDATOOLS=./build/lambda-calculus-devkit
 # ELVM
 8CC=./bin/8cc
 ELC=./bin/elc
-8CCLAM=./8cc.lam
-ELCLAM=./elc.lam
+8CCLAM=./out/8cc.lam
+ELCLAM=./out/elc.lam
 
 # Other
 SBCL=sbcl
@@ -99,8 +99,8 @@ out/lambda-8cc-main.lam: src/usage.cl $(wildcard src/*.cl)
 	cd src; $(SBCL) --script lambda-8cc.cl > ../out/lambda-8cc-main.lam.tmp
 	mv $@.tmp $@
 
-$(LAMBDA8CC): out/lambda-8cc-main.lam 8cc.lam elc.lam
-	( printf '('; cat out/lambda-8cc-main.lam 8cc.lam elc.lam; printf ')'; ) > $(LAMBDA8CC)
+$(LAMBDA8CC): out/lambda-8cc-main.lam $(8CCLAM) $(ELCLAM)
+	( printf '('; cat out/lambda-8cc-main.lam $(8CCLAM) $(ELCLAM); printf ')'; ) > $(LAMBDA8CC)
 
 
 #================================================================
@@ -133,11 +133,11 @@ out/8cc.eir: out/8cc.c $(8CC)
 out/elc.eir: out/elc.c $(8CC)
 	$(8CC) -S -o out/elc.eir out/elc.c
 
-8cc.lam: out/8cc.eir $(ELC)
-	$(ELC) -lam out/8cc.eir > 8cc.lam
+$(8CCLAM): out/8cc.eir $(ELC)
+	$(ELC) -lam out/8cc.eir > $(8CCLAM)
 
-elc.lam: out/elc.eir $(ELC)
-	$(ELC) -lam out/elc.eir > elc.lam
+$(ELCLAM): out/elc.eir $(ELC)
+	$(ELC) -lam out/elc.eir > $(ELCLAM)
 
 
 #================================================================
