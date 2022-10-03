@@ -96,7 +96,7 @@ run-a.lazy: $(LAZYK)
 #================================================================
 src/usage.cl: src/usage.txt src/compile-usage.sh
 	cd src; ./compile-usage.sh > usage.cl.tmp
-	cd src; mv usage.cl.tmp usage.cl
+	mv src/usage.cl.tmp $@
 
 out/lambda-8cc-main.lam: src/usage.cl $(wildcard src/*.cl)
 	mkdir -p out
@@ -104,7 +104,7 @@ out/lambda-8cc-main.lam: src/usage.cl $(wildcard src/*.cl)
 	mv $@.tmp $@
 
 $(LAMBDA8CC): out/lambda-8cc-main.lam $(8CCLAM) $(ELCLAM)
-	( printf '('; cat out/lambda-8cc-main.lam $(8CCLAM) $(ELCLAM); printf ')'; ) > $(LAMBDA8CC)
+	( printf '('; cat $^; printf ')'; ) > $@
 
 
 #================================================================
@@ -132,16 +132,16 @@ out/elc.c: elvm-private/Makefile
 	cd elvm-private && make out/elc.c && tools/merge_c.rb out/elc.c > ../out/elc.c
 
 out/8cc.eir: out/8cc.c $(8CC)
-	$(8CC) -S -o out/8cc.eir out/8cc.c
+	$(8CC) -S -o $@ $<
 
 out/elc.eir: out/elc.c $(8CC)
-	$(8CC) -S -o out/elc.eir out/elc.c
+	$(8CC) -S -o $@ $<
 
 $(8CCLAM): out/8cc.eir $(ELC)
-	$(ELC) -lam out/8cc.eir > $(8CCLAM)
+	$(ELC) -lam $< > $(8CCLAM)
 
 $(ELCLAM): out/elc.eir $(ELC)
-	$(ELC) -lam out/elc.eir > $(ELCLAM)
+	$(ELC) -lam $< > $(ELCLAM)
 
 
 #================================================================
