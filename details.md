@@ -6,9 +6,31 @@ To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdav
 a programmable virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrary number of registers,
 all expressed as a single lambda calculus term.
 
-The entire lambda calclus term for LambdaVM, the core of lambda-8cc, is very small. Here is its entire lambda calculus term:
+The entire lambda calclus term for LambdaVM, the core of lambda-8cc, is very small. Here is its entire lambda calculus term in plaintext:
 
-![The lambda calculus term for LambdaVM.](./bin/lambdavm.png)
+```text
+\x.\y.\z.\a.\b.((\c.((\d.((\e.((\f.((\g.((\h.(a ((\i.(i (d (\j.\k.(k (\l.\m.\n.\
+o.(o k (j m))) k)) a) (\j.(i z (d (\k.\l.\m.\n.\o.\p.((\q.((\r.((\s.(n (\t.\u.\v
+.\w.v) (\t.t) (\t.\u.\v.u) (\t.\u.u) (o (\t.\u.\v.(o (k l m) p)) o) (n (\t.\u.((
+\v.(t (\w.\A.\B.((\C.(A (C B) (s B C))) (\C.\D.(w (D ((\E.(m (\F.\G.\H.(E (y (\I
+.\J.(J (\K.\L.K) I)) F) G)) (E c m))) (\E.\F.(r B E (k l F u o)))) (\E.(E (y (\F
+.(F (\G.\H.H))) C) (v p))) A) (D (\E.\F.\G.\H.((\I.(F (I G) (s G I))) (s H (\I.\
+J.(E (e I C) (q J) (v p))))))) (D (\E.\F.((\G.(f (\H.\I.I) (E (s F e C)) G G (\H
+.(r F)))) c)) v) (q C) (h l C (r D) v) (s D (g l C) k m u o p) (D (\E.\F.(s E (f
+ F F) C (\G.(r E)))) v) (r D C v))))))) (k l m u o)))))) (h p))) (g p))) (\q.(h 
+j q (\r.(r (k l m) p))))))))))) (\i.\j.(d (\k.\l.\m.\n.(l (\o.\p.\q.(m (\r.\s.\t
+.(k l s (\u.\v.(k v s (\w.(n (\A.(A u w)))))))) (l n))) (n l l))) i c (\k.\l.(j 
+k)))) b) (\i.\j.j))) (d (\h.\i.\j.\k.(i (\l.\m.\n.(j (\o.\p.\q.(o (h l) (h m) p 
+k)) (k i))) (k c)))))) (d (\g.\h.\i.\j.\k.(i (\l.\m.\n.((\o.(h (\p.\q.\r.(l (h o
+) (o q p))) (o (\p.\q.q) (\p.\q.q)))) (\o.(g o m j (\p.\q.(l (k (\r.(r p q))) (k
+ (\r.(r q p))))))))) (k j)))))) (d (\f.\g.\h.\i.\j.\k.(i (\l.\m.\n.(j (\o.\p.(f 
+g h m p (\q.\r.((\s.((\t.((\u.((\v.(t s q (v (\w.\A.w)) (v (\w.\A.A)))) (t q (q 
+(\v.\w.w) (\v.\w.v)) (u (\v.\w.v)) (u (\v.\w.w))))) (\u.\v.(k v (\w.(w u r))))))
+ (\t.\u.(l (s t u) (s u t))))) (h o (o (\s.\t.t) (\s.\t.s))))))))) (k g i)))))) 
+(d (\e.\f.\g.(f (\h.\i.\j.(g (\k.\l.((\m.(h (k m (\n.\o.\p.o)) (k (\n.\o.\p.p) m
+))) (e i l))))) (\h.\i.\j.h)))))) (\d.((\e.(d (e e))) (\e.(d (e e))))))) ((\c.(y
+ c (x c (\d.\e.e)))) (\c.\d.(d (\e.\f.e) c))))
+```
 
 Shown here is a lambda calculus term featuring a RAM unit with 8 instructions including I/O and memory operations.
 lambda-8cc is written by passing the assembly code for 8cc, written in lambda calculus terms, to LambdaVM.
@@ -16,6 +38,8 @@ lambda-8cc is written by passing the assembly code for 8cc, written in lambda ca
 lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by [Rui Ueyama](https://github.com/rui314) to lambda calculus, written in C.
 lambda-8cc is made by running 8cc on LambdaVM.
 To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture written by [Shinichiro Hamaji](https://github.com/shinh) to compile C to a lambda calculus term compatible with LambdaVM.
+
+For more information on LambdaVM, please see the [LambdaVM repo](https://github.com/woodrush/lambdavm).
 
 
 ## Programming in Lambda Calculus
@@ -43,8 +67,7 @@ lambda-8cc is a combination of the following 3 projects:
 
 
 ## Detailed Stats
-Using a lambda calculus interpreter that runs on the terminal, lambda-8cc can be used to compile programs on your computer. Usage instructions are available in the next section.
-The compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
+Detailed stats for the compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) is summarized here:
 
 | Program                              | Compilation Time (a.s + a.out) | Max. Compilation RAM Usage (a.s, a.out) | x86 Binary Size         |
 |--------------------------------------|--------------------------------|-----------------------------------------|-------------------------|
@@ -52,8 +75,8 @@ The compilation time and memory usage on [Melvin Zhang](https://github.com/melvi
 | [hello.c](./examples/hello.c)        | 2.4 min (1.6 min + 0.8 min)    | 42 GB (42 GB, 22 GB)                    | 802 bytes               |
 | [echo.c](./examples/echo.c)          | 2.5 min (1.8 min + 0.7 min)    | 46 GB (46 GB, 17 GB)                    | 663 bytes               |
 | [rot13.c](./examples/rot13.c)        | 7.7 min (5.0 min + 2.7 min)    | 84 GB (84 GB, 65 GB)                    | 2,118 bytes             |
-| [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min (22.2 min + 27.5 min) | 200 GB (177 GB, 200 GB)                 | 5,512 bytes             |
-| [primes.c](./examples/primes.c)      | 53.0 min (24.0 min + 29.0 min) | 200 GB (172 GB, 200 GB)                 | 5,500 bytes             |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min (22.2 min + 27.5 min) | 240 GB (177 GB, 240 GB)                 | 5,512 bytes             |
+| [primes.c](./examples/primes.c)      | 53.0 min (24.0 min + 29.0 min) | 241 GB (172 GB, 241 GB)                 | 5,500 bytes             |
 
 
 ## Building From Source
@@ -85,7 +108,3 @@ make test-self-host
 
 This compiles 8cc.c and elc.c, the source codes for [8cc](https://github.com/rui314/8cc) and [elc](https://github.com/shinh/elvm/blob/master/target/elc.c) (a part of [ELVM](https://github.com/shinh/elvm)) using lambda-8cc, and compares its outputs with the results compiled by the x86-64 versions of 8cc and elc.
 As mentioned in [README.md](README.md), since this takes a lot of time and memory, this test is still yet unconfirmed.
-
-
-## Running on Lazy K
-lambda-8cc is also available in [Lazy K](https://tromp.github.io/cl/lazy-k.html), a language based on the [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus).

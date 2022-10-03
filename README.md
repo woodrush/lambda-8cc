@@ -5,7 +5,34 @@ The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lamb
 To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm),
 a programmable virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrary number of registers,
 all expressed as a single lambda calculus term.
-Despite its rather rich capability, LambdaVM has a very small lambda calculus term shown in [lambdavm.png](./bin/lambdavm.png).
+Despite its rather rich capability, LambdaVM has a very small lambda calculus term. Here is its entire term:
+
+```text
+LambdaVM = \x.\y.\z.\a.\b.((\c.((\d.((\e.((\f.((\g.((\h.(a ((\i.(i (d (\j.\k.(k 
+(\l.\m.\n.\o.(o k (j m))) k)) a) (\j.(i z (d (\k.\l.\m.\n.\o.\p.((\q.((\r.((\s.(
+n (\t.\u.\v.\w.v) (\t.t) (\t.\u.\v.u) (\t.\u.u) (o (\t.\u.\v.(o (k l m) p)) o) (
+n (\t.\u.((\v.(t (\w.\A.\B.((\C.(A (C B) (s B C))) (\C.\D.(w (D ((\E.(m (\F.\G.\
+H.(E (y (\I.\J.(J (\K.\L.K) I)) F) G)) (E c m))) (\E.\F.(r B E (k l F u o)))) (\
+E.(E (y (\F.(F (\G.\H.H))) C) (v p))) A) (D (\E.\F.\G.\H.((\I.(F (I G) (s G I)))
+ (s H (\I.\J.(E (e I C) (q J) (v p))))))) (D (\E.\F.((\G.(f (\H.\I.I) (E (s F e 
+C)) G G (\H.(r F)))) c)) v) (q C) (h l C (r D) v) (s D (g l C) k m u o p) (D (\E
+.\F.(s E (f F F) C (\G.(r E)))) v) (r D C v))))))) (k l m u o)))))) (h p))) (g p
+))) (\q.(h j q (\r.(r (k l m) p))))))))))) (\i.\j.(d (\k.\l.\m.\n.(l (\o.\p.\q.(
+m (\r.\s.\t.(k l s (\u.\v.(k v s (\w.(n (\A.(A u w)))))))) (l n))) (n l l))) i c
+ (\k.\l.(j k)))) b) (\i.\j.j))) (d (\h.\i.\j.\k.(i (\l.\m.\n.(j (\o.\p.\q.(o (h 
+l) (h m) p k)) (k i))) (k c)))))) (d (\g.\h.\i.\j.\k.(i (\l.\m.\n.((\o.(h (\p.\q
+.\r.(l (h o) (o q p))) (o (\p.\q.q) (\p.\q.q)))) (\o.(g o m j (\p.\q.(l (k (\r.(
+r p q))) (k (\r.(r q p))))))))) (k j)))))) (d (\f.\g.\h.\i.\j.\k.(i (\l.\m.\n.(j
+ (\o.\p.(f g h m p (\q.\r.((\s.((\t.((\u.((\v.(t s q (v (\w.\A.w)) (v (\w.\A.A))
+)) (t q (q (\v.\w.w) (\v.\w.v)) (u (\v.\w.v)) (u (\v.\w.w))))) (\u.\v.(k v (\w.(
+w u r)))))) (\t.\u.(l (s t u) (s u t))))) (h o (o (\s.\t.t) (\s.\t.s))))))))) (k
+ g i)))))) (d (\e.\f.\g.(f (\h.\i.\j.(g (\k.\l.((\m.(h (k m (\n.\o.\p.o)) (k (\n
+.\o.\p.p) m))) (e i l))))) (\h.\i.\j.h)))))) (\d.((\e.(d (e e))) (\e.(d (e e))))
+))) ((\c.(y c (x c (\d.\e.e)))) (\c.\d.(d (\e.\f.e) c))))
+```
+
+Shown here is a lambda calculus term featuring a programmable virtual CPU with 8 instructions including I/O and memory operations.
+It is also available as [an image](./bin/lambdavm.png).
 LambdaVM is also a self-contained project where you can enjoy assembly programming in lambda calculus.
 
 lambda-8cc is a port of [8cc](https://github.com/rui314/8cc) written by [Rui Ueyama](https://github.com/rui314) to lambda calculus, written in C.
@@ -15,9 +42,9 @@ To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture
 
 ## Overview
 ### Everything is Done as Lambdas
-lambda-8cc is a closed untyped lambda calculus term `lambda-8cc = \x. ...` which takes a C program written as a string as an input and outputs a x86 executable expressed as a list of bytes.
-Characters and bytes are encoded as a list of bits with `0 = \x.\y.x`, `1 = \x.\y.y`,
-and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with `cons = \x.\y.\f.(f x y)`, `nil = \x.\y.y`.
+lambda-8cc is a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs a x86 executable expressed as a list of bytes.
+Characters and bytes are encoded as a list of bits with $0 = \lambda x. \lambda y.x$, $1 = \lambda x. \lambda y.y$,
+and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with ${\rm cons} = \lambda x.\lambda y.\lambda f.(f x y)$, ${\rm nil} = \lambda x.\lambda y.y$.
 
 Therefore, _everything_ in the computation process, even including integers, is expressed as pure lambda terms,
 without the need of introducing any non-lambda type object whatsoever.
@@ -117,12 +144,12 @@ lam2bin is a utility that converts plaintext lambda calculus notation such as `\
 written by [Justine Tunney](https://github.com/jart) (available at [https://justine.lol/lambda/](https://justine.lol/lambda/)).
 Binary lambda calculus (BLC) is a highly compact notation for writing lambda calculus terms using only `0` and `1`, proposed by [John Tromp](https://github.com/tromp).
 Any lambda term with an arbitrary number of variables can be rewritten to BLC notation.
-For example, `\x.x` becomes `0010`.
+For example, $\lambda x.x$ becomes `0010`.
 I've written details on the BLC notation in [one of my blog posts](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation).
 The output of `cat lambda-8cc.lam | bin/lam2bin` is available as [./bin/lambda-8cc.blc.zip](./bin/lambda-8cc.blc.zip).
 
 [asc2bin](https://github.com/woodrush/lambda-calculus-devkit/blob/main/src/asc2bin.c) is a utility that packs the 0/1 ASCII bitstream to a byte stream.
-Using this tool, the encoding `0010` for `\x.x` becomes only half a byte.
+Using this tool, the encoding `0010` for $\lambda x.x$ becomes only half a byte.
 The interpreter uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
 
 All in all, the conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
@@ -169,9 +196,9 @@ The following table shows the compilation time and memory usage on [Melvin Zhang
 
 | Program                              | Compilation Time | Max. RAM Usage at Compilation Time  | x86 Binary Size         | Description                                                                  |
 |--------------------------------------|------------------|-------------------------------------|-------------------------|------------------------------------------------------------------------------|
-| [putchar.c](./examples/putchar.c)    | 1.8 min          | 36 GB                               | 342 bytes               | Prints `A`                                                                   |
-| [hello.c](./examples/hello.c)        | 2.4 min          | 51 GB                               | 802 bytes               | Prints `Hello, world!`                                                       |
-| [echo.c](./examples/echo.c)          | 2.5 min          | 57 GB                               | 663 bytes               | Echoes standard input                                                        |
+| [putchar.c](./examples/putchar.c)    | 1.8 min          | 31 GB                               | 342 bytes               | Prints `A`                                                                   |
+| [hello.c](./examples/hello.c)        | 2.4 min          | 42 GB                               | 802 bytes               | Prints `Hello, world!`                                                       |
+| [echo.c](./examples/echo.c)          | 2.5 min          | 46 GB                               | 663 bytes               | Echoes standard input                                                        |
 | [rot13.c](./examples/rot13.c)        | 7.7 min          | 84 GB                               | 2,118 bytes             | Encodes/decodes stdin to/from [ROT13](https://en.wikipedia.org/wiki/ROT13)   |
 | [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min         | 240 GB                              | 5,512 bytes             | Prints FizzBuzz sequence up to 30                                            |
 | [primes.c](./examples/primes.c)      | 53.0 min         | 241 GB                              | 5,500 bytes             | Prints primes up to 100                                                      |
@@ -294,11 +321,6 @@ are released under the MIT license. See the LICENSE in each location for details
     lambda-8cc: By Hikaru Ikuta - https://github.com/woodrush/lambda-8cc
 
 ```
-
-
-## Running on Lazy K
-lambda-8cc is also available in [Lazy K](https://tromp.github.io/cl/lazy-k.html), a language based on the [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus).
-For further details, please see [details.md](details.md).
 
 
 ## Building From Source
