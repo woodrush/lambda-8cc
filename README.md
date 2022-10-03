@@ -231,14 +231,22 @@ The tools involved here are:
 
 
 ### Applying Compilation Options
-The [compiler options](#compiler-options) shown before can be applied as follows:
+The [compiler options](#compiler-options) shown before can be applied as follows.
 
+To compile C to an ELVM assembly listing `a.s`:
 ```sh
 ( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.x) (\\x.\\y.\\z.\\a.\\b.b) (\\x.x)))' ) \
   | bin/lam2bin | bin/asc2bin; cat input.c ) | bin/uni++ -o > a.s
 ```
 
-The option shown here compiles C to an ELVM assembly listing `a.s`.
+To compile an ELVM assembly listing `a.s` to x86 executable `a.out`:
+```sh
+( ( cat lambda-8cc.lam; printf '(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.x) (\\x.x)))' ) \
+  | bin/lam2bin | bin/asc2bin; cat a.s ) | bin/uni++ -o > a.out
+chmod 755 a.out
+```
+
+As described before, by separately compiling `a.s` and `a.out`, the maximum RAM usage can be cut in half since the memory is freed when each process finishes.
 
 The full set of options can be shown by running lambda-8cc without any input or options,
 showing a usage message:
