@@ -86,7 +86,7 @@ out/elc.c: elvm-private/Makefile
 out/8cc.eir: out/8cc.c $(8CC)
 	$(8CC) -S -o out/8cc.eir out/8cc.c
 
-out/elc.eir: elvm-private/out/elc.c $(8CC)
+out/elc.eir: out/elc.c $(8CC)
 	$(8CC) -S -o out/elc.eir out/elc.c
 
 8cc.lam: out/8cc.eir $(ELC)
