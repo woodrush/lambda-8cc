@@ -1,3 +1,5 @@
+LAMBDA8CC=lambda-8cc.lam
+
 # Binary lambda calculus interpreter
 UNIPP=./bin/uni++
 CLAMB=./bin/clamb
@@ -33,45 +35,45 @@ OPT_S_TO_LAZY ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))'
 
 all: a.out
 
-a.s: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+a.s: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 
-a.out: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_X86) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+a.out: a.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_X86) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 	chmod 755 a.out
 
-a.out-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( cat lambda-8cc.lam | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
+a.out-onepass: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( cat $(LAMBDA8CC) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
 	chmod 755 a.out
 
 
 #================================================================
 # Other output languages
 #================================================================
-a.lam: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+a.lam: a.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 
-a.blc: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_BLC) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+a.blc: a.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_BLC) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 
-a.lazy: a.s lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf $(OPT_S_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+a.lazy: a.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 
-lam-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.lam.tmp
+lam-onepass: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_LAM) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.lam.tmp
 	mv a.lam.tmp a.lam
 
-blc-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_BLC) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.blc.tmp
+blc-onepass: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_BLC) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.blc.tmp
 	mv a.blc.tmp a.blc
 
-lazy-onepass: $(INPUT) lambda-8cc.lam $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat lambda-8cc.lam; printf $(OPT_C_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.lazy.tmp
+lazy-onepass: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_LAZY) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.lazy.tmp
 	mv a.lazy.tmp a.lazy
 
 
@@ -89,14 +91,16 @@ run-a.lazy: $(LAZYK)
 # Build lambda-8cc.lam
 #================================================================
 src/usage.cl: src/usage.txt
-	cd src; ./compile-usage.sh > usage.cl
+	cd src; ./compile-usage.sh > usage.cl.tmp
+	cd src; mv usage.cl.tmp usage.cl
 
-out/lambda-8cc-main.lam: src/lambda-8cc.cl src/lambdacraft.cl src/blc-numbers.cl src/usage.cl
+out/lambda-8cc-main.lam: src/usage.cl src/compile-usage.sh $(wildcard src/*.cl)
 	mkdir -p out
-	cd src; $(SBCL) --script lambda-8cc.cl > ../out/lambda-8cc-main.lam
+	cd src; $(SBCL) --script lambda-8cc.cl > ../out/lambda-8cc-main.lam.tmp
+	mv $@.tmp $@
 
-lambda-8cc.lam: out/lambda-8cc-main.lam 8cc.lam elc.lam
-	( printf '('; cat out/lambda-8cc-main.lam 8cc.lam elc.lam; printf ')'; ) > lambda-8cc.lam
+$(LAMBDA8CC): out/lambda-8cc-main.lam 8cc.lam elc.lam
+	( printf '('; cat out/lambda-8cc-main.lam 8cc.lam elc.lam; printf ')'; ) > $(LAMBDA8CC)
 
 
 #================================================================
