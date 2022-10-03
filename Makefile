@@ -90,11 +90,11 @@ run-a.lazy: $(LAZYK)
 #================================================================
 # Build lambda-8cc.lam
 #================================================================
-src/usage.cl: src/usage.txt
+src/usage.cl: src/usage.txt src/compile-usage.sh
 	cd src; ./compile-usage.sh > usage.cl.tmp
 	cd src; mv usage.cl.tmp usage.cl
 
-out/lambda-8cc-main.lam: src/usage.cl src/compile-usage.sh $(wildcard src/*.cl)
+out/lambda-8cc-main.lam: src/usage.cl $(wildcard src/*.cl)
 	mkdir -p out
 	cd src; $(SBCL) --script lambda-8cc.cl > ../out/lambda-8cc-main.lam.tmp
 	mv $@.tmp $@
