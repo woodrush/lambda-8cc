@@ -421,7 +421,7 @@
 (defun to-plaintext-lambda (&rest args)
   (apply to-plaintext-lambda* args))
 
-(defparameter to-lam* (lambda-compiler-builder "((~a) (~a))" "((~a) (~a))" "(\\~a.~a)"))
+(defparameter to-lam* (lambda-compiler-builder "(~a ~a)" "(~a ~a)" "(\\~a.~a)"))
 (defun to-lam (&rest args)
   (apply to-lam* args))
 
