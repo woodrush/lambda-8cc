@@ -5,8 +5,8 @@
 lambda-8cc is an x86 C compiler written as a monolithic closed untyped lambda calculus term.
 The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip).
 
-As an example, [rot13.c](examples/rot13.c) is a program that compiles on gcc with no errors.
-The exact same program can be compiled with lambda-8cc producing [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
+As an example, [rot13.c](examples/rot13.c) is a program that compiles on GCC with no errors.
+The exact same program can be compiled with lambda-8cc producing the Linux ELF executable [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
 
 ```sh
 $ echo "Hello, world!" | ./rot13.bin
@@ -25,7 +25,7 @@ and a modified version of [ELVM](https://github.com/shinh/elvm) by [Shinichiro H
 
 
 ## Overview
-### Everything is Done as Lambdas
+### Lambdas All the Way Down
 lambda-8cc is written as a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs an x86 Linux ELF executable expressed as a list of bytes.
 Characters and bytes are encoded as a list of bits with $0 = \lambda x. \lambda y.x$, $1 = \lambda x. \lambda y.y$,
 and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with ${\rm cons} = \lambda x.\lambda y.\lambda f.(f x y)$, ${\rm nil} = \lambda x.\lambda y.y$.
@@ -34,10 +34,10 @@ Therefore, _everything_ in the computation process, even including integers, is 
 without the need of introducing any non-lambda type object whatsoever.
 lambda-8cc makes [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#%CE%B2-reduction) the sole requirement for compiling C to x86.
 Note that the process doesn't depend on the choice of variable names as well.
-Instead of encoding the character `A` as a variable with the name `A`, it is encoded as a list of bits of its ASCII encoding `01000001`.
+Instead of encoding the character `A` as a variable with the name $A$, `A` is encoded as a list of bits of its ASCII encoding `01000001`.
 
 Various lambda calculus interpreters automatically handle this I/O format so that it runs on the terminal - standard input is encoded into lambda terms, and the output lambda term is decoded and shown on the terminal.
-Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like gcc.
+Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like GCC.
 
 For further details on how I/O is handled and how programs are written in lambda calculus,
 please see the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
@@ -80,7 +80,7 @@ I have covered a little bit about it on [my blog post](https://woodrush.github.i
 
 ## Basic Usage Example
 Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard input to/from the [ROT13](https://en.wikipedia.org/wiki/ROT13) cipher.
-It compiles without errors using gcc:
+It compiles without errors using GCC:
 
 ```c
 // rot13.c: Encodes/decodes standard input to/from the ROT13 cipher
@@ -173,38 +173,11 @@ Other compilation options are described in the [Detailed Usage](#detailed-usage)
 ## How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
 To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm).
 LambdaVM is a programmable virtual CPU with an arbitrarily configurable ROM/RAM address
-and word size with an arbitrary number of registers,
-expressed as a single lambda calculus term.
-Despite its rich capability, LambdaVM has a compact lambda calculus term.
-Here is its entire lambda calculus term in plaintext:
-
-```text
-LambdaVM = \x.\y.\z.\a.\b.((\c.((\d.((\e.((\f.((\g.((\h.(a ((\i.(i (d (\j.\k.(k 
-(\l.\m.\n.\o.(o k (j m))) k)) a) (\j.(i z (d (\k.\l.\m.\n.\o.\p.((\q.((\r.((\s.(
-n (\t.\u.\v.\w.v) (\t.t) (\t.\u.\v.u) (\t.\u.u) (o (\t.\u.\v.(o (k l m) p)) o) (
-n (\t.\u.((\v.(t (\w.\A.\B.((\C.(A (C B) (s B C))) (\C.\D.(w (D ((\E.(m (\F.\G.\
-H.(E (y (\I.\J.(J (\K.\L.K) I)) F) G)) (E c m))) (\E.\F.(r B E (k l F u o)))) (\
-E.(E (y (\F.(F (\G.\H.H))) C) (v p))) A) (D (\E.\F.\G.\H.((\I.(F (I G) (s G I)))
- (s H (\I.\J.(E (e I C) (q J) (v p))))))) (D (\E.\F.((\G.(f (\H.\I.I) (E (s F e 
-C)) G G (\H.(r F)))) c)) v) (q C) (h l C (r D) v) (s D (g l C) k m u o p) (D (\E
-.\F.(s E (f F F) C (\G.(r E)))) v) (r D C v))))))) (k l m u o)))))) (h p))) (g p
-))) (\q.(h j q (\r.(r (k l m) p))))))))))) (\i.\j.(d (\k.\l.\m.\n.(l (\o.\p.\q.(
-m (\r.\s.\t.(k l s (\u.\v.(k v s (\w.(n (\A.(A u w)))))))) (l n))) (n l l))) i c
- (\k.\l.(j k)))) b) (\i.\j.j))) (d (\h.\i.\j.\k.(i (\l.\m.\n.(j (\o.\p.\q.(o (h 
-l) (h m) p k)) (k i))) (k c)))))) (d (\g.\h.\i.\j.\k.(i (\l.\m.\n.((\o.(h (\p.\q
-.\r.(l (h o) (o q p))) (o (\p.\q.q) (\p.\q.q)))) (\o.(g o m j (\p.\q.(l (k (\r.(
-r p q))) (k (\r.(r q p))))))))) (k j)))))) (d (\f.\g.\h.\i.\j.\k.(i (\l.\m.\n.(j
- (\o.\p.(f g h m p (\q.\r.((\s.((\t.((\u.((\v.(t s q (v (\w.\A.w)) (v (\w.\A.A))
-)) (t q (q (\v.\w.w) (\v.\w.v)) (u (\v.\w.v)) (u (\v.\w.w))))) (\u.\v.(k v (\w.(
-w u r)))))) (\t.\u.(l (s t u) (s u t))))) (h o (o (\s.\t.t) (\s.\t.s))))))))) (k
- g i)))))) (d (\e.\f.\g.(f (\h.\i.\j.(g (\k.\l.((\m.(h (k m (\n.\o.\p.o)) (k (\n
-.\o.\p.p) m))) (e i l))))) (\h.\i.\j.h)))))) (\d.((\e.(d (e e))) (\e.(d (e e))))
-))) ((\c.(y c (x c (\d.\e.e)))) (\c.\d.(d (\e.\f.e) c))))
-```
-
-Shown here is a lambda calculus term featuring a RAM unit with 8 instructions including I/O and memory operations.
-It is also available [here](./bin/lambdavm.png) as an image.
+and word size with an arbitrary number of registers, expressed as a single lambda calculus term.
 LambdaVM is also a self-contained project where you can enjoy assembly programming in lambda calculus.
+
+Despite its rich capability, LambdaVM has a compact lambda calculus term shown in [this image](bin/lambdavm.png).
+The image at the top shows LambdaVM drawn as a [lambda diagram](http://tromp.github.io/cl/diagrams.html).
 
 Based on LambdaVM, I built lambda-8cc by porting the C compiler [8cc](https://github.com/rui314/8cc) written in C by [Rui Ueyama](https://github.com/rui314) to LambdaVM.
 This is done by compiling 8cc's C source code to an assembly for LambdaVM.
