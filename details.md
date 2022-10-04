@@ -95,4 +95,12 @@ Detailed stats for the compilation time and memory usage on [Melvin Zhang](https
 | [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min (22.2 min + 27.5 min) | 240 GB (177 GB, 240 GB)                 | 5,512 bytes             |
 | [primes.c](./examples/primes.c)      | 53.0 min (24.0 min + 29.0 min) | 241 GB (172 GB, 241 GB)                 | 5,500 bytes             |
 
+| Program                              | One-Pass Compilation Time      | One-Pass Max. Compilation RAM Usage     |
+|--------------------------------------|--------------------------------|-----------------------------------------|
+| [putchar.c](./examples/putchar.c)    |                                |                                         |
+| [hello.c](./examples/hello.c)        |                                |                                         |
+| [echo.c](./examples/echo.c)          |                                |                                         |
+| [rot13.c](./examples/rot13.c)        | 7.8 min                        | 145 GB                                  |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  |                                |                                         |
+| [primes.c](./examples/primes.c)      |                                |                                         |
 

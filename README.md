@@ -59,7 +59,7 @@ as long as we remember the rules for lambda calculus and have [the lambda term f
 we can still use the entire C language through lambda-8cc and build everything on top of it again.
 
 
-## Example
+## A Quick Example
 Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard input to/from the [ROT13](https://en.wikipedia.org/wiki/ROT13) cipher.
 It compiles without errors using gcc:
 
@@ -96,7 +96,10 @@ int main (void) {
 The same program can be compiled by lambda-8cc out of the box as follows:
 
 ```sh
+$ make uni++  # Build the interpreter
+$ unzip bin/lambda-8cc.lam.zip
 $ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc  # Prepare format for uni++
+
 $ cat lambda-8cc.Blc examples/rot13.c | bin/uni++ -o > a.out
 $ chmod 755 a.out
 
@@ -107,10 +110,14 @@ Hello, world!
 ```
 
 Here, uni++ is a very fast [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
-This takes about 8 minutes to run on my machine.
-More running time stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
-Detailed usage instructions are available in the [Usage](#usage) section.
 
+This runs in about 8 minutes on my machine. But be careful - it takes 145 GB of memory to run it!
+If you have free HDD space or a USB drive, you can use it to [dynamically extend your swap region](https://askubuntu.com/questions/178712/how-to-increase-swap-space)
+using a swap file with `mkswap` and `swapon` to run this.
+Also, by compiling the assembly and x86 executable separately, you can halve down the RAM usage to 65 GB, as shown in the [Usage](#usage) section.
+Small programs such as [putchar.c](examples/putchar.c) only take about 40 GB of memory.
+
+More running time stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 More example C programs compilable by lambda-8cc can be found under [./examples](./examples).
 
 
