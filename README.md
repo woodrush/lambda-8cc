@@ -1,4 +1,7 @@
 # lambda-8cc - An x86 C Compiler Written in Untyped Lambda Calculus
+
+![Lambda calculus diagram for LambdaVM.](bin/lambdavm-diagram.png)
+
 lambda-8cc is an x86 C compiler written as a monolithic closed untyped lambda calculus term.
 The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip).
 
