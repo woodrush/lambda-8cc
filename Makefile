@@ -46,14 +46,16 @@ a.s: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 a.out: a.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_X86) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
-	chmod 755 a.out
+	chmod 755 $@
 
 a.out-onepass: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 	( cat $(LAMBDA8CC) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
 	chmod 755 a.out
 
-$(INPUT):
+$(INPUT): examples/hello.c
 	cp examples/hello.c $@
+
+test: test-compile
 
 
 #================================================================
@@ -92,6 +94,33 @@ run-a.blc: $(ASC2BIN) $(UNIPP)
 
 run-a.lazy: $(LAZYK)
 	$(LAZYK) -u a.lazy
+
+
+#================================================================
+# Compilation test
+#================================================================
+out/test.c:
+	printf 'int main(void){return 0;}' > $@
+
+out/test.s: out/test.c $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	mkdir -p out
+	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+out/test.bin: out/test.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_X86) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+	mv $@.tmp $@
+
+out/test-8cc.s: out/test.c $(8CC)
+	$(8CC) -S -o $@ $<
+
+out/test-8cc.bin: out/test-8cc.s $(ELC)
+	$(ELC) -x86 $< > $@
+
+test-compile: out/test.bin out/test-8cc.bin
+	diff $^ || exit 1
+	diff out/test.s out/test-8cc.s || exit 1
+	echo "test-compile passed."
 
 
 #================================================================
