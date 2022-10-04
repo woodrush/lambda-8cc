@@ -119,7 +119,6 @@ out/test-8cc.bin: out/test-8cc.s $(ELC)
 
 test-compile: out/test.bin out/test-8cc.bin
 	diff $^ || exit 1
-	diff out/test.s out/test-8cc.s || exit 1
 	echo "test-compile passed."
 
 
