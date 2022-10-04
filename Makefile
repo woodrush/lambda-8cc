@@ -1,4 +1,5 @@
 LAMBDA8CC=lambda-8cc.lam
+LAMBDA8CCZIP=out/lambda-8cc.lam
 LAMBDA8CCLAZY=lambda-8cc.lazy
 
 # Binary lambda calculus interpreter
@@ -39,17 +40,17 @@ OPT_S_TO_LAZY ='(\\f.(f (\\x.\\y.y) (\\x.\\y.\\z.\\a.\\b.a) (\\x.x)))'
 
 all: a.out
 
-a.s: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat $(LAMBDA8CC); printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+a.s: $(INPUT) $(LAMBDA8CCZIP) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CCZIP); printf $(OPT_C_TO_S) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 
-a.out: a.s $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( ( cat $(LAMBDA8CC); printf $(OPT_S_TO_X86) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
+a.out: a.s $(LAMBDA8CCZIP) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( ( cat $(LAMBDA8CCZIP); printf $(OPT_S_TO_X86) ) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > $@.tmp
 	mv $@.tmp $@
 	chmod 755 $@
 
-a.out-onepass: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
-	( cat $(LAMBDA8CC) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
+a.out-onepass: $(INPUT) $(LAMBDA8CCZIP) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+	( cat $(LAMBDA8CCZIP) | $(LAM2BIN) | $(ASC2BIN); cat $< ) | $(UNIPP) -o > a.out
 	chmod 755 a.out
 
 $(INPUT): examples/hello.c
@@ -155,7 +156,7 @@ test-self-host: out/lambda-8cc-self.lam build/8cc.eir build/elc.eir $(8CCLAM) $(
 
 
 #================================================================
-# Build build/lambda-8cc-main.lam using LambdaLisp
+# Test for building build/lambda-8cc-main.lam using LambdaLisp
 #================================================================
 build/lambdalisp/bin/lambdalisp.blc:
 	mkdir -p build
@@ -182,15 +183,29 @@ src/usage.cl: src/usage.txt src/compile-usage.sh
 
 build/lambda-8cc-main.lam: src/usage.cl $(wildcard src/*.cl)
 	mkdir -p build
-	cd src; $(SBCL) --script lambda-8cc.cl > ../build/lambda-8cc-main.lam.tmp
+	cd src; $(SBCL) --script lambda-8cc.cl > ../$@.tmp
 	mv $@.tmp $@
 
 $(LAMBDA8CC): build/lambda-8cc-main.lam $(8CCLAM) $(ELCLAM)
 	( printf '('; cat $^; printf ')'; ) > $@
 
 
+out/lambda-8cc.blc: $(LAMBDA8CC) $(LAM2BIN)
+	cat $(LAMBDA8CC) | $(LAM2BIN) > $@.tmp
+	mv $@.tmp $@
+
+bin/lambda-8cc.lam.zip: $(LAMBDA8CC)
+	zip $@ $<
+
+bin/lambda-8cc.blc.zip: out/lambda-8cc.blc
+	zip $@ $<
+
+$(LAMBDA8CCZIP):
+	cd out; unzip ../bin/lambda-8cc.lam.zip
+
+
 #================================================================
-# Build lambda-8cc.lazy
+# Build lambda-8cc.lazy (WIP)
 #================================================================
 build/lambda-8cc-lazy.cl: src/usage.cl $(wildcard src/*.cl)
 	mkdir -p build
