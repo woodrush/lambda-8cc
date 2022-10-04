@@ -15,8 +15,7 @@ $ echo "Uryyb, jbeyq!" | ./rot13.bin
 Hello, world!
 ```
 
-Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus terms like [rot13.lam](out/rot13.lam) that runs on the same lambda calculus interpreter used to run lambda-8cc itself.
-lambda-8cc first compiles C programs to an intermediate assembly like [rot13.s](out/rot13.s) and then compiles it to various formats.
+Not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself. lambda-8cc first compiles C programs to an intermediate assembly ([rot13.s](out/rot13.s)) and then compiles it to various formats.
 
 lambda-8cc is based on the following 3 projects:
 The first one is [LambdaVM](https://github.com/woodrush/lambdavm) written by the author of this repo [Hikaru Ikuta](https://github.com/woodrush),
@@ -46,18 +45,15 @@ a Lisp interpreter written as an untyped lambda calculus term.
 
 
 ### C to Lambda Calculus
-Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus itself.
-Compiled lambda calculus terms run on the same lambda calculus interpreter used to run lambda-8cc.
-This makes lambda-8cc self-contained in the realm of lambda calculus.
-
+lambda-8cc can compile C to lambda calculus, making lambda-8cc self-contained in the realm of lambda calculus.
 The output program can also be run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by [Justine Tunney](https://github.com/jart),
 and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by [John Tromp](https://github.com/tromp) (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
 
-It has long been known in computer science that lambda calculus is turing-complete.
-lambda-8cc shows this in a rather straightforward way by demonstrating that C programs can directly be compiled to lambda calculus terms.
+It has long been known in computer science that lambda calculus is Turing-complete.
+lambda-8cc demonstrates this in a rather straightforward way by showing that C programs can directly be compiled into lambda calculus terms.
 
 The nice thing about lambda calculus is that the language specs are extremely simple.
-With lambda-8cc, in a way we are preserving knowledge about how to compile C in a timeless method.
+With lambda-8cc, we are preserving knowledge about how to compile C in a timeless method.
 Even if humanity loses knowledge about the x86 instruction set,
 as long as we remember the rules for lambda calculus and have [the lambda term for lambda-8cc](./bin/lambda-8cc.lam.zip),
 we can still use the entire C language through lambda-8cc and build everything on top of it again.
@@ -163,7 +159,7 @@ Hello, world!
 This runs in about 8 minutes on my machine. But be careful - it takes 145 GB of memory to run it!
 If you have free storage space or a USB drive, you can use a [swap file](https://askubuntu.com/questions/178712/how-to-increase-swap-space)
 with `mkswap` and `swapon` to extend the swap without configuring the partition settings.
-Also, by compiling the assembly and x86 executable separately, you can halve down the RAM usage to 65 GB, as shown in the [Detailed Usage](#detailed-usage) section.
+Also, by compiling the assembly and x86 executable separately, you can halve the RAM usage to 65 GB, as shown in the [Detailed Usage](#detailed-usage) section.
 Small programs such as [putchar.c](examples/putchar.c) only take about 40 GB of memory.
 I suspect that the RAM usage can be decreased by introducing a mark-and-sweep GC to the interpreter,
 although I haven't confirmed it yet.
@@ -175,10 +171,11 @@ Other compilation options are described in the [Detailed Usage](#detailed-usage)
 
 
 ## How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
-To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm),
-a programmable virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrary number of registers,
-all expressed as a single lambda calculus term.
-Despite its rather rich capability, LambdaVM has a very small lambda calculus term.
+To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm).
+LambdaVM is a programmable virtual CPU with an arbitrarily configurable ROM/RAM address
+and word size with an arbitrary number of registers,
+expressed as a single lambda calculus term.
+Despite its rich capability, LambdaVM has a compact lambda calculus term.
 Here is its entire lambda calculus term in plaintext:
 
 ```text
@@ -211,20 +208,18 @@ LambdaVM is also a self-contained project where you can enjoy assembly programmi
 
 Based on LambdaVM, I built lambda-8cc by porting the C compiler [8cc](https://github.com/rui314/8cc) written in C by [Rui Ueyama](https://github.com/rui314) to LambdaVM.
 This is done by compiling 8cc's C source code to an assembly for LambdaVM.
-To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture written by [Shinichiro Hamaji](https://github.com/shinh)
+To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastructure written by [Shinichiro Hamaji](https://github.com/shinh)
 to build a C compiler for LambdaVM, which I used to compile 8cc itself.
 
-The entire monolithic 40MB lambda calculus term is solely handled by this tiny virtual machine to run lambda-8cc.
-
+The entire monolithic 40MB lambda calculus term is handled solely by this tiny virtual machine to run lambda-8cc.
 
 
 ## Detailed Usage
 ### Compilation Options
-lambda-8cc's full features can be used by passing compilation options. Being written in lambda calculus,
-naturally, lambda-8cc's compilation options are written in lambda calculus terms as well.
+You can use lambda-8cc's full features by passing compilation options. Being written in lambda calculus, naturally, lambda-8cc's compilation options are written in lambda calculus terms as well.
 
-Compilation options are used by applying an optional term as `(lambda-8cc option)` beforehand of the input.
-This changes the behavior of the lambda term `lambda-8cc` so that it accepts/produces a different input/output format.
+Compilation options are used by applying an optional term as `(lambda-8cc option)` beforehand of the input. This changes the behavior of the lambda term `lambda-8cc` so that it accepts/produces a different input/output format.
+
 
 Here are the full list of lambda-8cc's compilation options:
 
@@ -244,11 +239,11 @@ Each option is in the format of a 3-tuple ${\rm cons3} ~ {\rm input} ~ {\rm outp
 The first element ${\rm input}$ is a selector of a 2-tuple that specifies the input format.
 The second element ${\rm output}$ is a selector of a 5-tuple that specifies the output format.
 The third element $X = \lambda x.x$ is a placeholder used to distinguish the data structure from the standard input,
-also existing for backwards portatiblity in case when more options are added in the future.
+also existing for backward portability in the case when more options are added in the future.
 
 
 ### Applying Compilation Options
-On the terminal, the compilation options shown before can be applied as follows.
+The compilation options shown before can be used in the terminal as follows.
 
 To compile C to an ELVM assembly listing `a.s`:
 ```sh
@@ -265,8 +260,7 @@ chmod 755 a.out
 
 As described before, by separately compiling `a.s` and `a.out` using these commands, the maximum RAM usage can be cut in half since the memory is freed when each process finishes.
 
-The full set of options can be shown by running lambda-8cc without any input or options,
-showing a usage message:
+By running lambda-8cc without any input or options, you can see a usage message showing the full set of options:
 
 ```text
 $ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin | bin/uni++ -o
@@ -313,19 +307,19 @@ The following table shows the compilation time and memory usage on [Melvin Zhang
 
 Now that is a lot of memory!
 To compile programs that require a huge RAM, you can extend your swap region without changing the partition settings by using a swap file.
-If you run Linux and have any storage device such as a HDD or USB drive,
+If you run Linux and have any free storage or a USB drive,
 you can use that storage to easily and dynamically extend your swap region using `mkswap` and `swapon`.
-The stats on this table are ran with an extended swap region this way.
+The stats on this table are run with an extended swap region this way.
 Instructions are explained in this [askubuntu thread](https://askubuntu.com/questions/178712/how-to-increase-swap-space).
 
 Note that these are the compilation times - the running times for the compiled x86 binary are instantaneous.
-This even holds when compiling to lambda calculus terms.
+This even holds when compiling C to lambda calculus terms.
 Compiled lambda terms also run instantaneously and only use a few gigabytes of memory when run on a lambda calculus interpreter.
 
 The compilations for these stats were run on an Ubuntu 22.04.1 machine with 48 GB RAM,
 16GB SSD swap (default partition), and 274GB (256GiB) HDD swap (dynamically added with `mkswap` and `swapon`).
 The running time shown here is the wall clock running time including memory operations.
-For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
+For swap-heavy programs, the running time could be decreased by using a device with a faster I/O speed.
 
 The stats were measured by running
 
