@@ -1,9 +1,9 @@
-# lambda-8cc: x86 C Compiler Written in Untyped Lambda Calculus
+# lambda-8cc - An x86 C Compiler Written in Untyped Lambda Calculus
 lambda-8cc is an x86 C compiler written as a monolithic closed untyped lambda calculus term.
 The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip).
 
-As a sneak peek, [rot13.c](examples/rot13.c) is a program that compiles on gcc with no errors.
-The exact same program can be compiled with lambda-8cc producing [rot13.bin](out/rot13.bin) runnable on x86/x86-64 Linux:
+As an example, [rot13.c](examples/rot13.c) is a program that compiles on gcc with no errors.
+The exact same program can be compiled with lambda-8cc producing [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
 
 ```sh
 $ echo "Hello, world!" | ./rot13.bin
@@ -24,7 +24,7 @@ and a modified version of [ELVM](https://github.com/shinh/elvm) by [Shinichiro H
 
 ## Overview
 ### Everything is Done as Lambdas
-lambda-8cc is written as a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs an x86 executable expressed as a list of bytes.
+lambda-8cc is written as a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs an x86 Linux ELF executable expressed as a list of bytes.
 Characters and bytes are encoded as a list of bits with $0 = \lambda x. \lambda y.x$, $1 = \lambda x. \lambda y.y$,
 and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with ${\rm cons} = \lambda x.\lambda y.\lambda f.(f x y)$, ${\rm nil} = \lambda x.\lambda y.y$.
 
@@ -46,7 +46,8 @@ a Lisp interpreter written as an untyped lambda calculus term.
 Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus itself.
 Compiled lambda calculus terms run on the same lambda calculus interpreter used to run lambda-8cc.
 This makes lambda-8cc self-contained in the realm of lambda calculus.
-The output program can also be run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by Justine Tunney,
+
+The output program can also be run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by [Justine Tunney](https://github.com/jart),
 and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by [John Tromp](https://github.com/tromp) (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
 
 It has long been known in computer science that lambda calculus is turing-complete.
@@ -61,17 +62,19 @@ we can still use the entire C language through lambda-8cc and build everything o
 
 ## Features
 lambda-8cc supports various input and output formats.
-Here is a full list of features supported by lambda-8cc:
+Here is a full list of its features:
 
-- Compile C to an x86 executable (a.out)
-- Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
-- Compile C to a [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html) program
-- Compile C to a [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (runnable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
-- Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
-- Compile ELVM assembly to x86/lambda calculus/BLC/SKI combinator calculus
+- Compile C to:
+  - x86 executable (a.out)
+  - Lambda calculus term (runs on the same interpreter as lambda-8cc)
+  - [Binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html) program
+  - [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (runnable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
+  - [ELVM](https://github.com/shinh/elvm) assembly listing
+- Compile ELVM assembly to:
+  - x86/lambda calculus/BLC/SKI combinator calculus (all of the above)
 
 [Lazy K](https://tromp.github.io/cl/lazy-k.html) is a minimal purely functional language with only 4 built-in operators,
-similar to the minimal imperative language BF which only has 8 instructions.
+similar to the minimal imperative language [BF](https://en.wikipedia.org/wiki/Brainfuck) which only has 8 instructions.
 I have covered a little bit about it on [my blog post](https://woodrush.github.io/blog/lambdalisp.html#lazy-k) as well.
 
 
@@ -127,13 +130,15 @@ The requirements are:
 - `clang++` for building `uni++`
 - `gcc` or `cc` for building `lam2bin` and `asc2bin`
 
-Tools built here are:
+The tools built here are:
 
 - `uni++`: A very fast [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
 - `lam2bin`: A utility written by [Justine Tunney](https://github.com/jart) (available at [https://justine.lol/lambda/](https://justine.lol/lambda/)),
    that converts plaintext lambda calculus notation such as `\x.x` to [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation,
    the format accepted by uni++.
 - `asc2bin`: A utility that packs the 0/1 ASCII bitstream to bytes.
+
+The tools are build via the [lambda calculus development kit](https://github.com/woodrush/lambda-calculus-devkit).
 
 The conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
 Details are described in [details.md](details.md).
@@ -155,8 +160,10 @@ Hello, world!
 This runs in about 8 minutes on my machine. But be careful - it takes 145 GB of memory to run it!
 If you have free storage space or a USB drive, you can use a [swap file](https://askubuntu.com/questions/178712/how-to-increase-swap-space)
 with `mkswap` and `swapon` to extend the swap without configuring the partition settings.
-Also, by compiling the assembly and x86 executable separately, you can halve down the RAM usage to 65 GB, as shown in the [Usage](#usage) section.
+Also, by compiling the assembly and x86 executable separately, you can halve down the RAM usage to 65 GB, as shown in the [Detailed Usage](#detailed-usage) section.
 Small programs such as [putchar.c](examples/putchar.c) only take about 40 GB of memory.
+I suspect that the RAM usage can be decreased by introducing a mark-and-sweep GC to the interpreter,
+although I haven't confirmed it yet.
 
 More running time stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 More example C programs compilable by lambda-8cc can be found under [./examples](./examples).
@@ -317,6 +324,15 @@ The compilations for these stats were run on an Ubuntu 22.04.1 machine with 48 G
 The running time shown here is the wall clock running time including memory operations.
 For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
 
+The stats were measured by running
+
+```sh
+cp examples/[program].c ./input.c
+make
+```
+
+which compiles `a.s` and `a.out` for `input.c` separately to save the total memory usage.
+A more detailed table of stats for each pass is shown in [details.md](details.md).
 
 
 ## Building From Source
