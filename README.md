@@ -126,60 +126,16 @@ Small programs such as [putchar.c](examples/putchar.c) only take about 40 GB of 
 More running time stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 More example C programs compilable by lambda-8cc can be found under [./examples](./examples).
 
-
-### What is lambda-8cc.Blc?
-lambda-8cc.Blc is lambda-8cc.lam ([./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip)) written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation. As in the previous command, it is built as:
-
-```sh
-cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc
-```
-
-lam2bin is a utility that converts plaintext lambda calculus notation such as `\x.x` to [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation,
-written by [Justine Tunney](https://github.com/jart) (available at [https://justine.lol/lambda/](https://justine.lol/lambda/)).
-Binary lambda calculus (BLC) is a highly compact notation for writing lambda calculus terms using only `0` and `1`, proposed by [John Tromp](https://github.com/tromp).
-Any lambda term with an arbitrary number of variables can be rewritten to BLC notation.
-For example, $\lambda x.x$ becomes `0010`.
-I've written details on the BLC notation in [one of my blog posts](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation).
-
-[asc2bin](https://github.com/woodrush/lambda-calculus-devkit/blob/main/src/asc2bin.c) is a utility that packs the 0/1 BLC bitstream in ASCII to a byte stream.
-Using this tool, the encoding `0010` for $\lambda x.x$ becomes only half a byte.
-The interpreter uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
-
-The output of `cat lambda-8cc.lam | bin/lam2bin` is available as [./bin/lambda-8cc.blc.zip](./bin/lambda-8cc.blc.zip).
-Note that this is different from the uppercase lambda-8cc.Blc after passing it to asc2bin.
-
-All in all, the conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
+Also, lambda-8cc.Blc is lambda-8cc.lam ([./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip)) written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation.
+Details are explained in [details.md](details.md).
+The conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
 
 
 ### Compiling C to Lambda Calculus
 Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus as well.
 [rot13.c](examples/rot13.c) compiles to [rot13.lam](out/rot13.lam), which runs on the same lambda calculus interpreter uni++.
-Here is what it looks like:
 
-```text
-((\x.\y.\z.\a.\b.((\c.((\d.((\e.((\f.((\g.((\h.(a ((\i.(i (d ( \j.\k.(k (\l.\m.\n.\o.(o k (j m))) k)) a) ...
-(\f.(f((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(x(x(y(x(x(x(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))
-(\f.(f((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(y(x(x(y(x(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))
-(\f.(f((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(y(x(y(y(x(x(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))
-(\f.(f((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(y(x(y(y(x(x(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))
-...
-(\f.(f
-  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.a)(\x.\y.x)((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))(\x.x)))(\x.\y.y)))
-(\f.(f
-  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.e)(\x.\y.y)(\x.(x(\y.\z.z)(\x.(x(\z.\a.z)(\x.(x(\a.\b.b)(\a.\b.b)))))))(\x.(x(\y.\z.z)(\x.(x(\z.\a.a)(\x.(x(\a.\b.a)(\a.\b.b)))))))))
-  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.d)(\x.\y.x)((\x.\y.(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))(\f.(f(\x.(x(\y.\z.z)(\x.(x(\z.\a.a)(\x.(x(\a.\b.a)(\a.\b.b)))))))(\x.\y.x)))))
-  ...
-(\f.(f
-  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.e)(\x.\y.y)(\x.(x(\y.\z.z)(\x.(x(\z.\a.a)(\x.(x(\a.\b.b)(\x.(x(\b.\c.b)(\b.\c.c)))))))))(\x.(x(\y.\z.z)(\x.(x(\z.\a.z)(\x.(x(\a.\b.a)(\a.\b.b)))))))))
-  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.d)(\x.\y.x)((\x.\y.(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))(\f.(f(\x.(x(\y.\z.z)(\x.(x(\z.\a.z)(\x.(x(\a.\b.a)(\a.\b.b)))))))(\x.\y.x)))))
-  ...
-(\f.(f
-  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.a)(\x.\y.x)((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(x(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))(\x.x)))(\x.\y.y)))
-...
-(\x.\y.y))))))))))))))))))
-```
-
-The first line is [LambdaVM](https://github.com/woodrush/lambdavm), described in the next section.
+The first line in [rot13.lam](out/rot13.lam) is [LambdaVM](https://github.com/woodrush/lambdavm), described in the next section.
 The following few lines are memory initialization values.
 The next lines with indentation are the instruction list shown in [rot13.s](out/rot13.s) encoded as lambda calculus terms
 passed to LambdaVM.
@@ -243,9 +199,9 @@ to build a C compiler for LambdaVM, which I used to compile 8cc itself.
 The entire monolithic 40MB lambda calculus term is solely handled by this tiny virtual machine to run lambda-8cc.
 
 
-## Features
-As mentioned earlier, not only can lambda-8cc compile C to x86, it can compile C to lambda calculus itself.
 
+## Features
+lambda-8cc supports various input and output formats.
 Here is a full list of features supported by lambda-8cc:
 
 - Compile C to an x86 executable (a.out)
@@ -257,6 +213,44 @@ Here is a full list of features supported by lambda-8cc:
 
 [Lazy K](https://tromp.github.io/cl/lazy-k.html) is a minimal purely functional language with only 4 built-in operators.
 I have covered a little bit about it on [my blog post](https://woodrush.github.io/blog/lambdalisp.html#lazy-k) as well.
+
+
+
+## Usage
+To compile [hello.c](./examples/hello.c) to x86 using lambda-8cc, simply run:
+
+```sh
+make
+```
+
+You can then run `a.out` as follows, just as you would do in gcc:
+
+```text
+$ ./a.out
+Hello, world!
+```
+
+
+`make` simplifies a lot of steps. To run each step manually:
+
+```sh
+make tools
+unzip bin/lambda-8cc.lam.zip
+cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc
+
+cat lambda-8cc.Blc input.c | bin/uni++ -o > a.out
+chmod 755 a.out
+
+./a.out
+```
+
+The tools involved here are:
+- [uni++](https://github.com/melvinzhang/binary-lambda-calculus): A lambda calculus interpreter written by Melvin Zhang [@melvinzhang](https://github.com/melvinzhang).
+  - The original name of `uni++` is `uni`. Its source [uni.cpp](https://github.com/melvinzhang/binary-lambda-calculus/blob/master/uni.cpp) is written by Melvin Zhang. uni.cpp is a rewrite of [uni.c](https://github.com/melvinzhang/binary-lambda-calculus/blob/master/uni.c) written by John Tromp [@tromp](https://github.com/tromp), also named `uni`. To prevent the confusion, I have renamed it `uni++` here in this repository.
+  - `uni++` features a lot of optimizations including memoization and marker collapsing which significantly speeds up the execution time of gigantic lambda calculus programs.
+- `lam2bin`: A tool for rewriting plaintext lambda terms to [binary lambda calculus](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation) notation, which encodes lambda terms using only the characters `0` and `1`.
+- `asc2bin`: A tool for packing the 0/1 BLC bitstream to a byte stream, the format accepted by `uni++`.
+
 
 
 ### Compiler Options
@@ -284,91 +278,6 @@ The first element ${\rm input}$ is a selector of a 2-tuple that specifies the in
 The second element ${\rm output}$ is a selector of a 5-tuple that specifies the output format.
 The third element $X = \lambda x.x$ is a placeholder used to distinguish the data structure from the standard input,
 also existing for backwards portatiblity in case when more options are added in the future.
-
-Usage of these options on the terminal are explained in the [Usage](#usage) section.
-
-
-## Running Times and Memory Usage
-The following table shows the compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s
-[lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus).
-
-| Program                              | Compilation Time | Max. RAM Usage at Compilation Time  | x86 Binary Size         | Description                                                                  |
-|--------------------------------------|------------------|-------------------------------------|-------------------------|------------------------------------------------------------------------------|
-| [putchar.c](./examples/putchar.c)    | 1.8 min          | 31 GB                               | 342 bytes               | Prints `A`                                                                   |
-| [hello.c](./examples/hello.c)        | 2.4 min          | 42 GB                               | 802 bytes               | Prints `Hello, world!`                                                       |
-| [echo.c](./examples/echo.c)          | 2.5 min          | 46 GB                               | 663 bytes               | Echoes standard input                                                        |
-| [rot13.c](./examples/rot13.c)        | 7.7 min          | 84 GB                               | 2,118 bytes             | Encodes/decodes stdin to/from [ROT13](https://en.wikipedia.org/wiki/ROT13)   |
-| [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min         | 240 GB                              | 5,512 bytes             | Prints FizzBuzz sequence up to 30                                            |
-| [primes.c](./examples/primes.c)      | 53.0 min         | 241 GB                              | 5,500 bytes             | Prints primes up to 100                                                      |
-
-Now that is a lot of memory!
-To compile programs that require a huge RAM, you can extend your swap region without changing the partition settings by using a swap file.
-If you run Linux and have any storage device such as a HDD or USB drive,
-you can use that storage to easily and dynamically extend your swap region using `mkswap` and `swapon`.
-The stats on this table are ran with an extended swap region this way.
-Instructions are explained in this [askubuntu thread](https://askubuntu.com/questions/178712/how-to-increase-swap-space).
-
-Note that these are the compilation times - the running times for the compiled x86 binary are instantaneous.
-This even holds when compiling to lambda calculus terms.
-Compiled lambda terms also run instantaneously and only use a few gigabytes of memory when run on a lambda calculus interpreter.
-
-The compilations for these stats were run on an Ubuntu 22.04.1 machine with 48 GB RAM,
-16GB SSD swap (default partition), and 274GB (256GiB) HDD swap (dynamically added with `mkswap` and `swapon`).
-The running time shown here is the wall clock running time including memory operations.
-For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
-
-
-## Theoretically Self-Hosting
-lambda-8cc is a port of [8cc](https://github.com/rui314/8cc).
-It is also made by compiling 8cc using 8cc itself.
-Therefore, given enough time and memory, lambda-8cc can compile its own C source code as well.
-This makes lambda-8cc a self-hosting C compiler.
-Further details are explained in [details.md](details.md).
-
-However, on currently existing lambda calculus interpreters, the RAM usage explodes for such large programs. 
-It would be very exciting to have a lambda calculus interpreter that runs lambda-8cc in a practical time and memory.
-
-
-
-## Usage
-To compile [hello.c](./examples/hello.c) to x86 using lambda-8cc, simply run:
-
-```sh
-make
-```
-
-This will unzip [lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip),
-build the [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) `uni++` written by [Melvin Zhang](https://github.com/melvinzhang),
-and run lambda-8cc on `uni++` creating `a.out`.
-You can then run `a.out` as follows, just as you would do in gcc:
-
-```text
-$ ./a.out
-Hello, world!
-```
-
-
-`make` simplifies a lot of steps. To run each step manually, do the following:
-
-```sh
-make uni++ lam2bin asc2bin
-unzip bin/lambda-8cc.lam.zip
-cat lambda-8cc.lam | ./bin/lam2bin > lambda-8cc.blc
-cat lambda-8cc.blc | ./bin/asc2bin > lambda-8cc.Blc
-
-cat lambda-8cc.Blc input.c | ./bin/uni++ -o > a.out
-chmod 755 a.out
-
-./a.out
-```
-
-The tools involved here are:
-- [uni++](https://github.com/melvinzhang/binary-lambda-calculus): A lambda calculus interpreter written by Melvin Zhang [@melvinzhang](https://github.com/melvinzhang).
-  - The original name of `uni++` is `uni`. Its source [uni.cpp](https://github.com/melvinzhang/binary-lambda-calculus/blob/master/uni.cpp) is written by Melvin Zhang. uni.cpp is a rewrite of [uni.c](https://github.com/melvinzhang/binary-lambda-calculus/blob/master/uni.c) written by John Tromp [@tromp](https://github.com/tromp), also named `uni`. To prevent the confusion, I have renamed it `uni++` here in this repository.
-  - `uni++` features a lot of optimizations including memoization and marker collapsing which significantly speeds up the execution time of gigantic lambda calculus programs.
-- `lam2bin`: A tool for rewriting plaintext lambda terms to [binary lambda calculus](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation) notation, which encodes lambda terms using only the characters `0` and `1`.
-- `asc2bin`: A tool for packing the 0/1 BLC bitstream to a byte stream, the format accepted by `uni++`.
-
 
 
 ### Applying Compilation Options
@@ -420,6 +329,37 @@ are released under the MIT license. See the LICENSE in each location for details
     lambda-8cc: By Hikaru Ikuta - https://github.com/woodrush/lambda-8cc
 
 ```
+
+
+## Running Times and Memory Usage
+The following table shows the compilation time and memory usage on [Melvin Zhang](https://github.com/melvinzhang)'s
+[lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus).
+
+| Program                              | Compilation Time | Max. RAM Usage at Compilation Time  | x86 Binary Size         | Description                                                                  |
+|--------------------------------------|------------------|-------------------------------------|-------------------------|------------------------------------------------------------------------------|
+| [putchar.c](./examples/putchar.c)    | 1.8 min          | 31 GB                               | 342 bytes               | Prints `A`                                                                   |
+| [hello.c](./examples/hello.c)        | 2.4 min          | 42 GB                               | 802 bytes               | Prints `Hello, world!`                                                       |
+| [echo.c](./examples/echo.c)          | 2.5 min          | 46 GB                               | 663 bytes               | Echoes standard input                                                        |
+| [rot13.c](./examples/rot13.c)        | 7.7 min          | 84 GB                               | 2,118 bytes             | Encodes/decodes stdin to/from [ROT13](https://en.wikipedia.org/wiki/ROT13)   |
+| [fizzbuzz.c](./examples/fizzbuzz.c)  | 49.7 min         | 240 GB                              | 5,512 bytes             | Prints FizzBuzz sequence up to 30                                            |
+| [primes.c](./examples/primes.c)      | 53.0 min         | 241 GB                              | 5,500 bytes             | Prints primes up to 100                                                      |
+
+Now that is a lot of memory!
+To compile programs that require a huge RAM, you can extend your swap region without changing the partition settings by using a swap file.
+If you run Linux and have any storage device such as a HDD or USB drive,
+you can use that storage to easily and dynamically extend your swap region using `mkswap` and `swapon`.
+The stats on this table are ran with an extended swap region this way.
+Instructions are explained in this [askubuntu thread](https://askubuntu.com/questions/178712/how-to-increase-swap-space).
+
+Note that these are the compilation times - the running times for the compiled x86 binary are instantaneous.
+This even holds when compiling to lambda calculus terms.
+Compiled lambda terms also run instantaneously and only use a few gigabytes of memory when run on a lambda calculus interpreter.
+
+The compilations for these stats were run on an Ubuntu 22.04.1 machine with 48 GB RAM,
+16GB SSD swap (default partition), and 274GB (256GiB) HDD swap (dynamically added with `mkswap` and `swapon`).
+The running time shown here is the wall clock running time including memory operations.
+For swap-heavy programs, the running time could be decreased by using a RAM/storage with a faster I/O speed.
+
 
 
 ## Building From Source

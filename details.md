@@ -18,6 +18,14 @@ make lambda-8cc.lam
 
 
 ## Self-Hosting Test
+lambda-8cc is a port of [8cc](https://github.com/rui314/8cc).
+It is also made by compiling 8cc using 8cc itself.
+Therefore, given enough time and memory, lambda-8cc can compile its own C source code as well.
+This makes lambda-8cc a self-hosting C compiler.
+
+However, on currently existing lambda calculus interpreters, the RAM usage explodes for such large programs. 
+It would be very exciting to have a lambda calculus interpreter that runs lambda-8cc in a practical time and memory.
+
 When running `make lambda-8cc.lam`, the source files `build/8cc.c` and `build/elc.c` are created.
 These are the files that are used to create `build/8cc.lam` and `build/elc.lam` which are linked to create `lambda-8cc.lam`.
 Since the files `build/8cc.c` and `build/elc.c` are compilable by the x86-64 versions of 8cc and elc,
@@ -103,4 +111,28 @@ Detailed stats for the compilation time and memory usage on [Melvin Zhang](https
 | [rot13.c](./examples/rot13.c)        | 7.8 min                        | 145 GB                                  |
 | [fizzbuzz.c](./examples/fizzbuzz.c)  |                                |                                         |
 | [primes.c](./examples/primes.c)      |                                |                                         |
+
+## What is lambda-8cc.Blc?
+lambda-8cc.Blc is lambda-8cc.lam ([./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip)) written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation.
+It is built as:
+
+```sh
+cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc
+```
+
+lam2bin is a utility that converts plaintext lambda calculus notation such as `\x.x` to [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation,
+written by [Justine Tunney](https://github.com/jart) (available at [https://justine.lol/lambda/](https://justine.lol/lambda/)).
+Binary lambda calculus (BLC) is a highly compact notation for writing lambda calculus terms using only `0` and `1`, proposed by [John Tromp](https://github.com/tromp).
+Any lambda term with an arbitrary number of variables can be rewritten to BLC notation.
+For example, $\lambda x.x$ becomes `0010`.
+I've written details on the BLC notation in [one of my blog posts](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation).
+
+[asc2bin](https://github.com/woodrush/lambda-calculus-devkit/blob/main/src/asc2bin.c) is a utility that packs the 0/1 BLC bitstream in ASCII to a byte stream.
+Using this tool, the encoding `0010` for $\lambda x.x$ becomes only half a byte.
+The interpreter uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
+
+The output of `cat lambda-8cc.lam | bin/lam2bin` is available as [./bin/lambda-8cc.blc.zip](./bin/lambda-8cc.blc.zip).
+Note that this is different from the uppercase lambda-8cc.Blc after passing it to asc2bin.
+
+All in all, the conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
 
