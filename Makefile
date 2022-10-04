@@ -55,6 +55,8 @@ a.out-onepass: $(INPUT) $(LAMBDA8CC) $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 $(INPUT): examples/hello.c
 	cp examples/hello.c $@
 
+tools: $(LAM2BIN) $(ASC2BIN) $(UNIPP)
+
 test: test-compile
 
 

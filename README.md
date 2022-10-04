@@ -96,7 +96,7 @@ int main (void) {
 The same program can be compiled by lambda-8cc out of the box as follows:
 
 ```sh
-$ make uni++  # Build the interpreter
+$ make tools  # Build the interpreter uni++ and the tools lam2bin, asc2bin
 $ unzip bin/lambda-8cc.lam.zip
 $ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc  # Prepare format for uni++
 
@@ -109,6 +109,7 @@ $ echo "Uryyb, jbeyq!" | ./a.out
 Hello, world!
 ```
 
+The requirement here is `clang++` for building `uni++` and `gcc` or `cc` for building `lam2bin` and `asc2bin`.
 Here, uni++ is a very fast [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
 
 This runs in about 8 minutes on my machine. But be careful - it takes 145 GB of memory to run it!
