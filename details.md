@@ -136,3 +136,27 @@ Note that this is different from the uppercase lambda-8cc.Blc after passing it t
 
 All in all, the conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
 
+
+## About rot13.lam
+[rot13.c](examples/rot13.c) compiles to [rot13.lam](out/rot13.lam), which runs on the same lambda calculus interpreter uni++.
+
+The first line in [rot13.lam](out/rot13.lam) is [LambdaVM](https://github.com/woodrush/lambdavm), described in the next section.
+The following few lines are memory initialization values.
+The next lines with indentation are the instruction list shown in [rot13.s](out/rot13.s) encoded as lambda calculus terms
+passed to LambdaVM.
+
+rot13.lam can be run on [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) binary lambda calculus interpreter written by [John Tromp](https://github.com/tromp).
+It can be used to decipher its hint message [how13](https://www.ioccc.org/2012/tromp/how13), uncovering some of the secrets of the magical lambda calculus interpreter which the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in shape of a λ:
+
+```sh
+wget https://www.ioccc.org/2012/tromp/tromp.c
+gcc -Wall -W -std=c99 -O2 -m64 -DInt=long -DA=9999999 -DX=8 tromp.c -o tromp
+
+wget https://www.ioccc.org/2012/tromp/how13
+
+cat rot13.lam | bin/lam2bin | bin/asc2bin > rot13.Blc
+cat rot13.Blc how13 | ./tromp
+```
+
+These commands run on Linux. Building `tromp` on a Mac is a little tricky but possible - I've covered the details [here](https://github.com/woodrush/lambdalisp#building-tromp-on-a-mac).
+

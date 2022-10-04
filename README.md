@@ -59,7 +59,24 @@ as long as we remember the rules for lambda calculus and have [the lambda term f
 we can still use the entire C language through lambda-8cc and build everything on top of it again.
 
 
-## A Quick Example
+## Features
+lambda-8cc supports various input and output formats.
+Here is a full list of features supported by lambda-8cc:
+
+- Compile C to an x86 executable (a.out)
+- Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
+- Compile C to a [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html) program
+- Compile C to a [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (runnable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
+- Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
+- Compile ELVM assembly to x86/lambda calculus/BLC/SKI combinator calculus
+
+[Lazy K](https://tromp.github.io/cl/lazy-k.html) is a minimal purely functional language with only 4 built-in operators,
+similar to the minimal imperative language BF which only has 8 instructions.
+I have covered a little bit about it on [my blog post](https://woodrush.github.io/blog/lambdalisp.html#lazy-k) as well.
+
+
+
+## Basic Usage Example
 Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard input to/from the [ROT13](https://en.wikipedia.org/wiki/ROT13) cipher.
 It compiles without errors using gcc:
 
@@ -94,7 +111,10 @@ int main (void) {
 ```
 
 The same program can be compiled by lambda-8cc out of the box as follows.
-First build the tools:
+
+
+### Build the Tools
+First build the tools and prepare lambda-8cc:
 
 ```sh
 $ make tools  # Build the interpreter uni++ and the tools lam2bin, asc2bin
@@ -102,6 +122,24 @@ $ unzip bin/lambda-8cc.lam.zip
 $ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc  # Prepare format for uni++
 ```
 
+The requirements are:
+
+- `clang++` for building `uni++`
+- `gcc` or `cc` for building `lam2bin` and `asc2bin`
+
+Tools built here are:
+
+- `uni++`: A very fast [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
+- `lam2bin`: A utility written by [Justine Tunney](https://github.com/jart) (available at [https://justine.lol/lambda/](https://justine.lol/lambda/)),
+   that converts plaintext lambda calculus notation such as `\x.x` to [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation,
+   the format accepted by uni++.
+- `asc2bin`: A utility that packs the 0/1 ASCII bitstream to bytes.
+
+The conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
+Details are described in [details.md](details.md).
+
+
+### Compile the Program Using lambda-8cc
 Then rot13.c can be compiled as:
 
 ```sh
@@ -114,46 +152,16 @@ $ echo "Uryyb, jbeyq!" | ./a.out
 Hello, world!
 ```
 
-The requirement here is `clang++` for building `uni++` and `gcc` or `cc` for building `lam2bin` and `asc2bin`.
-Here, uni++ is a very fast [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
-
 This runs in about 8 minutes on my machine. But be careful - it takes 145 GB of memory to run it!
-If you have free HDD space or a USB drive, you can use it to [dynamically extend your swap region](https://askubuntu.com/questions/178712/how-to-increase-swap-space)
-using a swap file with `mkswap` and `swapon` to run this.
+If you have free storage space or a USB drive, you can use a [swap file](https://askubuntu.com/questions/178712/how-to-increase-swap-space)
+with `mkswap` and `swapon` to extend the swap without configuring the partition settings.
 Also, by compiling the assembly and x86 executable separately, you can halve down the RAM usage to 65 GB, as shown in the [Usage](#usage) section.
 Small programs such as [putchar.c](examples/putchar.c) only take about 40 GB of memory.
 
 More running time stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 More example C programs compilable by lambda-8cc can be found under [./examples](./examples).
 
-Also, lambda-8cc.Blc is lambda-8cc.lam ([./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip)) written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation.
-Details are explained in [details.md](details.md).
-The conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
-
-
-### Compiling C to Lambda Calculus
-Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus as well.
-[rot13.c](examples/rot13.c) compiles to [rot13.lam](out/rot13.lam), which runs on the same lambda calculus interpreter uni++.
-
-The first line in [rot13.lam](out/rot13.lam) is [LambdaVM](https://github.com/woodrush/lambdavm), described in the next section.
-The following few lines are memory initialization values.
-The next lines with indentation are the instruction list shown in [rot13.s](out/rot13.s) encoded as lambda calculus terms
-passed to LambdaVM.
-
-rot13.lam can be run on [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) binary lambda calculus interpreter written by [John Tromp](https://github.com/tromp).
-It can be used to decipher its hint message [how13](https://www.ioccc.org/2012/tromp/how13), uncovering some of the secrets of the magical lambda calculus interpreter which the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in shape of a λ:
-
-```sh
-wget https://www.ioccc.org/2012/tromp/tromp.c
-gcc -Wall -W -std=c99 -O2 -m64 -DInt=long -DA=9999999 -DX=8 tromp.c -o tromp
-
-wget https://www.ioccc.org/2012/tromp/how13
-
-cat rot13.lam | bin/lam2bin | bin/asc2bin > rot13.Blc
-cat rot13.Blc how13 | ./tromp
-```
-
-These commands run on Linux. Building `tromp` on a Mac is a little tricky but possible - I've covered the details [here](https://github.com/woodrush/lambdalisp#building-tromp-on-a-mac).
+Other compilation options are described in the [Detailed Usage](#detailed-usage) section.
 
 
 ## How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
@@ -200,68 +208,17 @@ The entire monolithic 40MB lambda calculus term is solely handled by this tiny v
 
 
 
-## Features
-lambda-8cc supports various input and output formats.
-Here is a full list of features supported by lambda-8cc:
+## Detailed Usage
+### Compilation Options
+lambda-8cc's full features can be used by passing compilation options. Being written in lambda calculus,
+naturally, lambda-8cc's compilation options are written in lambda calculus terms as well.
 
-- Compile C to an x86 executable (a.out)
-- Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
-- Compile C to a binary lambda calculus program (runnable on [SectorLambda](https://justine.lol/lambda/) and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter)
-- Compile C to a [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (runnable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
-- Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
-- Compile ELVM assembly to x86/lambda calculus/BLC/SKI combinator calculus
-
-[Lazy K](https://tromp.github.io/cl/lazy-k.html) is a minimal purely functional language with only 4 built-in operators.
-I have covered a little bit about it on [my blog post](https://woodrush.github.io/blog/lambdalisp.html#lazy-k) as well.
-
-
-
-## Usage
-To compile [hello.c](./examples/hello.c) to x86 using lambda-8cc, simply run:
-
-```sh
-make
-```
-
-You can then run `a.out` as follows, just as you would do in gcc:
-
-```text
-$ ./a.out
-Hello, world!
-```
-
-
-`make` simplifies a lot of steps. To run each step manually:
-
-```sh
-make tools
-unzip bin/lambda-8cc.lam.zip
-cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc
-
-cat lambda-8cc.Blc input.c | bin/uni++ -o > a.out
-chmod 755 a.out
-
-./a.out
-```
-
-The tools involved here are:
-- [uni++](https://github.com/melvinzhang/binary-lambda-calculus): A lambda calculus interpreter written by Melvin Zhang [@melvinzhang](https://github.com/melvinzhang).
-  - The original name of `uni++` is `uni`. Its source [uni.cpp](https://github.com/melvinzhang/binary-lambda-calculus/blob/master/uni.cpp) is written by Melvin Zhang. uni.cpp is a rewrite of [uni.c](https://github.com/melvinzhang/binary-lambda-calculus/blob/master/uni.c) written by John Tromp [@tromp](https://github.com/tromp), also named `uni`. To prevent the confusion, I have renamed it `uni++` here in this repository.
-  - `uni++` features a lot of optimizations including memoization and marker collapsing which significantly speeds up the execution time of gigantic lambda calculus programs.
-- `lam2bin`: A tool for rewriting plaintext lambda terms to [binary lambda calculus](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation) notation, which encodes lambda terms using only the characters `0` and `1`.
-- `asc2bin`: A tool for packing the 0/1 BLC bitstream to a byte stream, the format accepted by `uni++`.
-
-
-
-### Compiler Options
-The aforementioned features can be used by passing a compiler option to lambda-8cc. Being written in lambda calculus, naturally, lambda-8cc's compiler options are written in lambda calculus terms as well.
-
-Compiler options are used by applying an optional term as `(lambda-8cc option)` beforehand of the input.
+Compilation options are used by applying an optional term as `(lambda-8cc option)` beforehand of the input.
 This changes the behavior of the lambda term `lambda-8cc` so that it accepts/produces a different input/output format.
 
-Here are the full list of lambda-8cc's compiler options:
+Here are the full list of lambda-8cc's compilation options:
 
-| Input         | Output                                          | Compiler Option                                                                                                      |
+| Input         | Output                                          | Compilation Option                                                                                                      |
 |---------------|-------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
 | C             | x86 executable                                  | $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.x) ~ (\lambda x.x))$ |
 | C             | Plaintext lambda calculus term                  | $\lambda f. (f ~ (\lambda x. \lambda y. x) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.y) ~ (\lambda x.x))$ |
@@ -281,7 +238,7 @@ also existing for backwards portatiblity in case when more options are added in 
 
 
 ### Applying Compilation Options
-The [compiler options](#compiler-options) shown before can be applied as follows.
+On the terminal, the compilation options shown before can be applied as follows.
 
 To compile C to an ELVM assembly listing `a.s`:
 ```sh
