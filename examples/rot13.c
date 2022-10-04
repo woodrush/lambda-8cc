@@ -1,3 +1,5 @@
+// rot13.c: Encodes/decodes standard input to/from the ROT13 cipher
+
 #define EOF -1
 
 int putchar(int c);
