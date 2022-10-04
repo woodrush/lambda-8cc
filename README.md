@@ -2,18 +2,24 @@
 lambda-8cc is a x86 C compiler written as a monolithic closed untyped lambda calculus term.
 The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip).
 
-This is over 200 times larger than my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
-a Lisp interpreter written as a 42-page long untyped lambda calculus term,
-which can be seen in [this PDF](https://woodrush.github.io/lambdalisp.pdf).
+As a sneak peek, [rot13.c](examples/rot13.c) is a program that compiles on gcc with no errors.
+The exact same program can be compiled with lambda-8cc producing [rot13.bin](out/rot13.bin) runnable on x86/x86-64 Linux:
+
+```sh
+$ echo "Hello, world!" | ./rot13.bin
+Uryyb, jbeyq!
+$ echo "Uryyb, jbeyq!" | ./rot13.bin
+Hello, world!
+```
+
+Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus terms like [rot13.lam](out/rot13.lam) that runs on the same lambda calculus interpreter used to run lambda-8cc itself.
+lambda-8cc first compiles C programs to an intermediate assembly like [rot13.s](out/rot13.s) and then compiles it to various formats.
 
 lambda-8cc is based on the following 3 projects:
-[LambdaVM](https://github.com/woodrush/lambdavm) written by the author of this repo [Hikaru Ikuta](https://github.com/woodrush),
-[8cc](https://github.com/rui314/8cc) by [Rui Ueyama](https://github.com/rui314),
-and [ELVM](https://github.com/shinh/elvm) by [Shinichiro Hamaji](https://github.com/shinh).
-The source is written using a Common Lisp DSL [LambdaCraft](https://github.com/woodrush/lambdacraft) written by myself,
-also used to build [LambdaLisp](https://github.com/woodrush/lambdalisp).
-
-The key ingredient of lambda-8cc is [LambdaVM](https://github.com/woodrush/lambdavm), a programmable virtual CPU written as an untyped lambda calculus term.
+The first one is [LambdaVM](https://github.com/woodrush/lambdavm) written by the author of this repo [Hikaru Ikuta](https://github.com/woodrush),
+a programmable virtual CPU written as an untyped lambda calculus term.
+This is combined with [8cc](https://github.com/rui314/8cc) by [Rui Ueyama](https://github.com/rui314),
+and a modified version of [ELVM](https://github.com/shinh/elvm) by [Shinichiro Hamaji](https://github.com/shinh).
 
 
 ## Overview
@@ -46,7 +52,7 @@ and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioc
 The nice thing about lambda calculus is that the language specs are extremely simple.
 With lambda-8cc, in a way we are preserving knowledge about how to compile C in a timeless method.
 Even if humanity loses knowledge about the x86 instruction set,
-as long as we remember the rules for lambda calculus and have the lambda term for lambda-8cc,
+as long as we remember the rules for lambda calculus and have [the lambda term for lambda-8cc](./bin/lambda-8cc.lam.zip),
 we can still use the entire C language through lambda-8cc and build everything on top of it again.
 
 
@@ -55,6 +61,8 @@ Here is a program [rot13.c](examples/rot13.c) that encodes/decodes standard inpu
 It compiles without errors using gcc:
 
 ```c
+// rot13.c: Encodes/decodes standard input to/from the ROT13 cipher
+
 #define EOF -1
 
 int putchar(int c);
@@ -106,6 +114,8 @@ wget https://www.ioccc.org/2012/tromp/how13
 cat how13 | ./a.out
 ```
 
+More example C programs compilable by lambda-8cc can be found under [./examples](./examples).
+
 
 ### What is lambda-8cc.Blc?
 lambda-8cc.Blc is lambda-8cc.lam ([./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip)) written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation, made as follows:
@@ -122,11 +132,46 @@ For example, $\lambda x.x$ becomes `0010`.
 I've written details on the BLC notation in [one of my blog posts](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation).
 The output of `cat lambda-8cc.lam | bin/lam2bin` is available as [./bin/lambda-8cc.blc.zip](./bin/lambda-8cc.blc.zip).
 
-[asc2bin](https://github.com/woodrush/lambda-calculus-devkit/blob/main/src/asc2bin.c) is a utility that packs the 0/1 ASCII bitstream to a byte stream.
+[asc2bin](https://github.com/woodrush/lambda-calculus-devkit/blob/main/src/asc2bin.c) is a utility that packs the 0/1 BLC bitstream in ASCII to a byte stream.
 Using this tool, the encoding `0010` for $\lambda x.x$ becomes only half a byte.
 The interpreter uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
 
 All in all, the conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
+
+
+### Compiling C to Lambda Calculus
+Not only can lambda-8cc compile C to x86, it can compile C to lambda calculus as well.
+[rot13.c](examples/rot13.c) compiles to [rot13.lam](out/rot13.lam), which runs on the same lambda calculus interpreter uni++.
+Here is what it looks like:
+
+```text
+((\x.\y.\z.\a.\b.((\c.((\d.((\e.((\f.((\g.((\h.(a ((\i.(i (d ( \j.\k.(k (\l.\m.\n.\o.(o k (j m))) k)) a) ...
+(\f.(f((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(x(x(y(x(x(x(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))
+(\f.(f((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(y(x(x(y(x(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))
+(\f.(f((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(y(x(y(y(x(x(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))
+(\f.(f((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(y(x(y(y(x(x(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))
+...
+(\f.(f
+  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.a)(\x.\y.x)((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))(\x.x)))(\x.\y.y)))
+(\f.(f
+  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.e)(\x.\y.y)(\x.(x(\y.\z.z)(\x.(x(\z.\a.z)(\x.(x(\a.\b.b)(\a.\b.b)))))))(\x.(x(\y.\z.z)(\x.(x(\z.\a.a)(\x.(x(\a.\b.a)(\a.\b.b)))))))))
+  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.d)(\x.\y.x)((\x.\y.(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))(\f.(f(\x.(x(\y.\z.z)(\x.(x(\z.\a.a)(\x.(x(\a.\b.a)(\a.\b.b)))))))(\x.\y.x)))))
+  ...
+(\f.(f
+  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.e)(\x.\y.y)(\x.(x(\y.\z.z)(\x.(x(\z.\a.a)(\x.(x(\a.\b.b)(\x.(x(\b.\c.b)(\b.\c.c)))))))))(\x.(x(\y.\z.z)(\x.(x(\z.\a.z)(\x.(x(\a.\b.a)(\a.\b.b)))))))))
+  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.d)(\x.\y.x)((\x.\y.(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))(\f.(f(\x.(x(\y.\z.z)(\x.(x(\z.\a.z)(\x.(x(\a.\b.a)(\a.\b.b)))))))(\x.\y.x)))))
+  ...
+(\f.(f
+  (\f.(f(\f.(f(\x.\y.\z.\a.\b.\c.\d.\e.a)(\x.\y.x)((\x.\y.(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(x(y(x(y(\x.\y.y))))))))))))))))))))))))))(\x.\y.(y(\x.\a.x)x))(\x.\y.(y(\x.\a.a)x)))(\x.x)))(\x.\y.y)))
+...
+(\x.\y.y))))))))))))))))))
+```
+
+The first line is [LambdaVM](https://github.com/woodrush/lambdavm), described in the next section.
+The following few lines are memory initialization values.
+The next lines with indentation are the instruction list shown in [rot13.s](out/rot13.s) encoded as lambda calculus terms
+passed to LambdaVM.
+
 
 
 ## How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
@@ -169,6 +214,8 @@ This is done by compiling 8cc's C source code to an assembly for LambdaVM.
 To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture written by [Shinichiro Hamaji](https://github.com/shinh)
 to build a C compiler for LambdaVM, which I used to compile 8cc itself.
 
+The entire monolithic 40MB lambda calculus term is solely handled by this tiny virtual machine to run lambda-8cc.
+
 
 ## Features
 As mentioned earlier, not only can lambda-8cc compile C to x86, it can compile C to lambda calculus itself.
@@ -181,6 +228,10 @@ Here is a full list of features supported by lambda-8cc:
 - Compile C to a [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (runnable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
 - Compile C to an [ELVM](https://github.com/shinh/elvm) assembly listing
 - Compile ELVM assembly to x86/lambda calculus/BLC/SKI combinator calculus
+
+[Lazy K](https://tromp.github.io/cl/lazy-k.html) is a minimal purely functional language with only 4 built-in operators.
+I have covered a little bit about it on [my blog post](https://woodrush.github.io/blog/lambdalisp.html#lazy-k) as well.
+
 
 ### Compiler Options
 The aforementioned features can be used by passing a compiler option to lambda-8cc. Being written in lambda calculus, naturally, lambda-8cc's compiler options are written in lambda calculus terms as well.
@@ -201,6 +252,12 @@ Here are the full list of lambda-8cc's compiler options:
 | ELVM assembly | Plaintext lambda calculus term                  | $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.y) ~ (\lambda x.x))$ |
 | ELVM assembly | Binary lambda calculus notation (BLC program)   | $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.z) ~ (\lambda x.x))$ |
 | ELVM assembly | SKI combinator calculus (Lazy K program)        | $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.a) ~ (\lambda x.x))$ |
+
+Each option is in the format of a 3-tuple ${\rm cons3} ~ {\rm input} ~ {\rm output} ~ X$ where ${\rm cons 3} = \lambda x. \lambda y. \lambda z. \lambda f. (f x y z)$.
+The first element ${\rm input}$ is a selector of a 2-tuple that specifies the input format.
+The second element ${\rm output}$ is a selector of a 5-tuple that specifies the output format.
+The third element $X = \lambda x.x$ is a placeholder used to distinguish the data structure from the standard input,
+also existing for backwards portatiblity in case when more options are added in the future.
 
 Usage of these options on the terminal are explained in the [Usage](#usage) section.
 
@@ -284,7 +341,7 @@ The tools involved here are:
   - The original name of `uni++` is `uni`. Its source [uni.cpp](https://github.com/melvinzhang/binary-lambda-calculus/blob/master/uni.cpp) is written by Melvin Zhang. uni.cpp is a rewrite of [uni.c](https://github.com/melvinzhang/binary-lambda-calculus/blob/master/uni.c) written by John Tromp [@tromp](https://github.com/tromp), also named `uni`. To prevent the confusion, I have renamed it `uni++` here in this repository.
   - `uni++` features a lot of optimizations including memoization and marker collapsing which significantly speeds up the execution time of gigantic lambda calculus programs.
 - `lam2bin`: A tool for rewriting plaintext lambda terms to [binary lambda calculus](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation) notation, which encodes lambda terms using only the characters `0` and `1`.
-- `asc2bin`: A tool for packing the 0/1 bitstream to a byte stream, the format accepted by `uni++`.
+- `asc2bin`: A tool for packing the 0/1 BLC bitstream to a byte stream, the format accepted by `uni++`.
 
 
 
@@ -349,7 +406,8 @@ lambda-8cc is a combination of 3 projects, [LambdaVM](https://github.com/woodrus
 The [ELVM](https://github.com/shinh/elvm) architecture was written by [Shinichiro Hamaji](https://github.com/shinh).
 [8cc](https://github.com/rui314/8cc) was written by [Rui Ueyama](https://github.com/rui314).
 The version of 8cc used in lambda-8cc is a modified version of 8cc included as a part of ELVM, modified by Shinichiro Hamaji and others.
-lambda-8cc also includes elc, a part of ELVM, which compiles ELVM assembly to x86 and lambda calculus, written by Shinichiro Hamaji.
+lambda-8cc also includes elc, a part of ELVM written by Shinichiro Hamaji,
+modified by Hikaru Ikuta so that it can compile ELVM assembly to lambda calculus.
 The lambda calculus backend for ELVM was written by Hikaru Ikuta, by integrating LambdaVM into ELVM.
 The running time and memory usage statistics were measured using a [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) written by [Melvin Zhang](https://github.com/melvinzhang).
 lam2bin was written by [Justine Tunney](https://github.com/jart).
