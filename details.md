@@ -1,10 +1,9 @@
 # lambda-8cc Details
-Here I will explain further details about lambda-8cc.
-
 
 ## Building From Source
 ### Requirements
-- gcc (11.2.0)
+- clang++ (Ubuntu clang version 14.0.0-1ubuntu1) (used for building uni++)
+- gcc (11.2.0) (used for building lam2bin and asc2bin)
 - ruby (3.0.2p107) (used for building 8cc.c and elc.c in ELVM)
 - SBCL (2.1.11) (used for building lambda-8cc-main.lam)
 
@@ -31,7 +30,7 @@ These are the files that are used to create `build/8cc.lam` and `build/elc.lam` 
 Since the files `build/8cc.c` and `build/elc.c` are compilable by the x86-64 versions of 8cc and elc,
 which is lambda-8cc itself, lambda-8cc.lam should be able to compile these C sources as well.
 
-The following Make rule does this exact thing:
+The following Make rule runs this exact procedure:
 
 ```sh
 make test-self-host
