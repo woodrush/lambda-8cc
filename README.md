@@ -7,19 +7,13 @@ a Lisp interpreter written as a 42-page long untyped lambda calculus term,
 which can be seen in [this PDF](https://woodrush.github.io/lambdalisp.pdf).
 
 lambda-8cc is based on the following 3 projects:
-
-- [LambdaVM](https://github.com/woodrush/lambdavm) written by the author of this repo [Hikaru Ikuta](https://github.com/woodrush)
-  - A programmable virtual CPU written as an untyped lambda calculus term
-- [8cc](https://github.com/rui314/8cc) by [Rui Ueyama](https://github.com/rui314)
-  - A minimal C compiler written in C, capable of compiling its own source code
-  - lambda-8cc is made by porting 8cc to LambdaVM.
-- [ELVM](https://github.com/shinh/elvm) by [Shinichiro Hamaji](https://github.com/shinh)
-  - A C compiler infrastructure for [esoteric programming languages](https://en.wikipedia.org/wiki/Esoteric_programming_language)
-  - I integrated LambdaVM into ELVM to build a C compiler that compiles C to lambda calculus.
-  - Using this compiler, I ported 8cc to lambda calculus and made lambda-8cc, which compiles C to x86.
-
-I also used [LambdaCraft](https://github.com/woodrush/lambdacraft) written by myself, which is a Common Lisp DSL for building large lambda calculus programs,
+[LambdaVM](https://github.com/woodrush/lambdavm) written by the author of this repo [Hikaru Ikuta](https://github.com/woodrush),
+[8cc](https://github.com/rui314/8cc) by [Rui Ueyama](https://github.com/rui314),
+and [ELVM](https://github.com/shinh/elvm) by [Shinichiro Hamaji](https://github.com/shinh).
+The source is written using a Common Lisp DSL [LambdaCraft](https://github.com/woodrush/lambdacraft) written by myself,
 also used to build [LambdaLisp](https://github.com/woodrush/lambdalisp).
+
+The key ingredient of lambda-8cc is [LambdaVM](https://github.com/woodrush/lambdavm), a programmable virtual CPU written as an untyped lambda calculus term.
 
 
 ## Overview
@@ -37,46 +31,9 @@ Instead of encoding the character `A` as a variable with the name `A`, it is enc
 Various lambda calculus interpreters automatically handle this I/O format so that it runs on the terminal - standard input is encoded into lambda terms, and the output lambda term is decoded and shown on the terminal.
 Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like gcc.
 
-
-### How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
-To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm),
-a programmable virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrary number of registers,
-all expressed as a single lambda calculus term.
-Despite its rather rich capability, LambdaVM has a very small lambda calculus term.
-Here is its entire lambda calculus term in plaintext:
-
-```text
-LambdaVM = \x.\y.\z.\a.\b.((\c.((\d.((\e.((\f.((\g.((\h.(a ((\i.(i (d (\j.\k.(k 
-(\l.\m.\n.\o.(o k (j m))) k)) a) (\j.(i z (d (\k.\l.\m.\n.\o.\p.((\q.((\r.((\s.(
-n (\t.\u.\v.\w.v) (\t.t) (\t.\u.\v.u) (\t.\u.u) (o (\t.\u.\v.(o (k l m) p)) o) (
-n (\t.\u.((\v.(t (\w.\A.\B.((\C.(A (C B) (s B C))) (\C.\D.(w (D ((\E.(m (\F.\G.\
-H.(E (y (\I.\J.(J (\K.\L.K) I)) F) G)) (E c m))) (\E.\F.(r B E (k l F u o)))) (\
-E.(E (y (\F.(F (\G.\H.H))) C) (v p))) A) (D (\E.\F.\G.\H.((\I.(F (I G) (s G I)))
- (s H (\I.\J.(E (e I C) (q J) (v p))))))) (D (\E.\F.((\G.(f (\H.\I.I) (E (s F e 
-C)) G G (\H.(r F)))) c)) v) (q C) (h l C (r D) v) (s D (g l C) k m u o p) (D (\E
-.\F.(s E (f F F) C (\G.(r E)))) v) (r D C v))))))) (k l m u o)))))) (h p))) (g p
-))) (\q.(h j q (\r.(r (k l m) p))))))))))) (\i.\j.(d (\k.\l.\m.\n.(l (\o.\p.\q.(
-m (\r.\s.\t.(k l s (\u.\v.(k v s (\w.(n (\A.(A u w)))))))) (l n))) (n l l))) i c
- (\k.\l.(j k)))) b) (\i.\j.j))) (d (\h.\i.\j.\k.(i (\l.\m.\n.(j (\o.\p.\q.(o (h 
-l) (h m) p k)) (k i))) (k c)))))) (d (\g.\h.\i.\j.\k.(i (\l.\m.\n.((\o.(h (\p.\q
-.\r.(l (h o) (o q p))) (o (\p.\q.q) (\p.\q.q)))) (\o.(g o m j (\p.\q.(l (k (\r.(
-r p q))) (k (\r.(r q p))))))))) (k j)))))) (d (\f.\g.\h.\i.\j.\k.(i (\l.\m.\n.(j
- (\o.\p.(f g h m p (\q.\r.((\s.((\t.((\u.((\v.(t s q (v (\w.\A.w)) (v (\w.\A.A))
-)) (t q (q (\v.\w.w) (\v.\w.v)) (u (\v.\w.v)) (u (\v.\w.w))))) (\u.\v.(k v (\w.(
-w u r)))))) (\t.\u.(l (s t u) (s u t))))) (h o (o (\s.\t.t) (\s.\t.s))))))))) (k
- g i)))))) (d (\e.\f.\g.(f (\h.\i.\j.(g (\k.\l.((\m.(h (k m (\n.\o.\p.o)) (k (\n
-.\o.\p.p) m))) (e i l))))) (\h.\i.\j.h)))))) (\d.((\e.(d (e e))) (\e.(d (e e))))
-))) ((\c.(y c (x c (\d.\e.e)))) (\c.\d.(d (\e.\f.e) c))))
-```
-
-Shown here is a lambda calculus term featuring a RAM unit with 8 instructions including I/O and memory operations.
-It is also available [here](./bin/lambdavm.png) as an image.
-LambdaVM is also a self-contained project where you can enjoy assembly programming in lambda calculus.
-
-Based on LambdaVM, I built lambda-8cc by porting the C compiler [8cc](https://github.com/rui314/8cc) written in C by [Rui Ueyama](https://github.com/rui314) to LambdaVM.
-This is done by compiling 8cc's C source code to an assembly for LambdaVM.
-To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture written by [Shinichiro Hamaji](https://github.com/shinh)
-to build a C compiler for LambdaVM, which I used to compile 8cc itself.
+For further details on how I/O is handled and how programs are written in lambda calculus,
+please see the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
+a Lisp interpreter written as an untyped lambda calculus term.
 
 
 ### C to Lambda Calculus
@@ -91,12 +48,6 @@ With lambda-8cc, in a way we are preserving knowledge about how to compile C in 
 Even if humanity loses knowledge about the x86 instruction set,
 as long as we remember the rules for lambda calculus and have the lambda term for lambda-8cc,
 we can still use the entire C language through lambda-8cc and build everything on top of it again.
-
-
-### Further Details
-For further details on how I/O is handled and how programs are written in lambda calculus,
-please see the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
-a Lisp interpreter written as an untyped lambda calculus term.
 
 
 ## Example
@@ -176,6 +127,47 @@ Using this tool, the encoding `0010` for $\lambda x.x$ becomes only half a byte.
 The interpreter uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
 
 All in all, the conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
+
+
+## How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
+To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm),
+a programmable virtual CPU with an arbitrarily configurable ROM/RAM address size and word size with an arbitrary number of registers,
+all expressed as a single lambda calculus term.
+Despite its rather rich capability, LambdaVM has a very small lambda calculus term.
+Here is its entire lambda calculus term in plaintext:
+
+```text
+LambdaVM = \x.\y.\z.\a.\b.((\c.((\d.((\e.((\f.((\g.((\h.(a ((\i.(i (d (\j.\k.(k 
+(\l.\m.\n.\o.(o k (j m))) k)) a) (\j.(i z (d (\k.\l.\m.\n.\o.\p.((\q.((\r.((\s.(
+n (\t.\u.\v.\w.v) (\t.t) (\t.\u.\v.u) (\t.\u.u) (o (\t.\u.\v.(o (k l m) p)) o) (
+n (\t.\u.((\v.(t (\w.\A.\B.((\C.(A (C B) (s B C))) (\C.\D.(w (D ((\E.(m (\F.\G.\
+H.(E (y (\I.\J.(J (\K.\L.K) I)) F) G)) (E c m))) (\E.\F.(r B E (k l F u o)))) (\
+E.(E (y (\F.(F (\G.\H.H))) C) (v p))) A) (D (\E.\F.\G.\H.((\I.(F (I G) (s G I)))
+ (s H (\I.\J.(E (e I C) (q J) (v p))))))) (D (\E.\F.((\G.(f (\H.\I.I) (E (s F e 
+C)) G G (\H.(r F)))) c)) v) (q C) (h l C (r D) v) (s D (g l C) k m u o p) (D (\E
+.\F.(s E (f F F) C (\G.(r E)))) v) (r D C v))))))) (k l m u o)))))) (h p))) (g p
+))) (\q.(h j q (\r.(r (k l m) p))))))))))) (\i.\j.(d (\k.\l.\m.\n.(l (\o.\p.\q.(
+m (\r.\s.\t.(k l s (\u.\v.(k v s (\w.(n (\A.(A u w)))))))) (l n))) (n l l))) i c
+ (\k.\l.(j k)))) b) (\i.\j.j))) (d (\h.\i.\j.\k.(i (\l.\m.\n.(j (\o.\p.\q.(o (h 
+l) (h m) p k)) (k i))) (k c)))))) (d (\g.\h.\i.\j.\k.(i (\l.\m.\n.((\o.(h (\p.\q
+.\r.(l (h o) (o q p))) (o (\p.\q.q) (\p.\q.q)))) (\o.(g o m j (\p.\q.(l (k (\r.(
+r p q))) (k (\r.(r q p))))))))) (k j)))))) (d (\f.\g.\h.\i.\j.\k.(i (\l.\m.\n.(j
+ (\o.\p.(f g h m p (\q.\r.((\s.((\t.((\u.((\v.(t s q (v (\w.\A.w)) (v (\w.\A.A))
+)) (t q (q (\v.\w.w) (\v.\w.v)) (u (\v.\w.v)) (u (\v.\w.w))))) (\u.\v.(k v (\w.(
+w u r)))))) (\t.\u.(l (s t u) (s u t))))) (h o (o (\s.\t.t) (\s.\t.s))))))))) (k
+ g i)))))) (d (\e.\f.\g.(f (\h.\i.\j.(g (\k.\l.((\m.(h (k m (\n.\o.\p.o)) (k (\n
+.\o.\p.p) m))) (e i l))))) (\h.\i.\j.h)))))) (\d.((\e.(d (e e))) (\e.(d (e e))))
+))) ((\c.(y c (x c (\d.\e.e)))) (\c.\d.(d (\e.\f.e) c))))
+```
+
+Shown here is a lambda calculus term featuring a RAM unit with 8 instructions including I/O and memory operations.
+It is also available [here](./bin/lambdavm.png) as an image.
+LambdaVM is also a self-contained project where you can enjoy assembly programming in lambda calculus.
+
+Based on LambdaVM, I built lambda-8cc by porting the C compiler [8cc](https://github.com/rui314/8cc) written in C by [Rui Ueyama](https://github.com/rui314) to LambdaVM.
+This is done by compiling 8cc's C source code to an assembly for LambdaVM.
+To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastrucuture written by [Shinichiro Hamaji](https://github.com/shinh)
+to build a C compiler for LambdaVM, which I used to compile 8cc itself.
 
 
 ## Features
