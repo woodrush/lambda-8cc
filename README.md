@@ -96,6 +96,7 @@ int main (void) {
 The same program can be compiled by lambda-8cc out of the box as follows:
 
 ```sh
+$ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc  # Prepare format for uni++
 $ cat lambda-8cc.Blc examples/rot13.c | bin/uni++ -o > a.out
 $ chmod 755 a.out
 
@@ -114,10 +115,10 @@ More example C programs compilable by lambda-8cc can be found under [./examples]
 
 
 ### What is lambda-8cc.Blc?
-lambda-8cc.Blc is lambda-8cc.lam ([./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip)) written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation, made as follows:
+lambda-8cc.Blc is lambda-8cc.lam ([./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip)) written in [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation. As in the previous command, it is built as:
 
 ```sh
-$ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc
+cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc
 ```
 
 lam2bin is a utility that converts plaintext lambda calculus notation such as `\x.x` to [binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html#Lambda_encoding) notation,
