@@ -93,13 +93,18 @@ int main (void) {
 }
 ```
 
-The same program can be compiled by lambda-8cc out of the box as follows:
+The same program can be compiled by lambda-8cc out of the box as follows.
+First build the tools:
 
 ```sh
 $ make tools  # Build the interpreter uni++ and the tools lam2bin, asc2bin
 $ unzip bin/lambda-8cc.lam.zip
 $ cat lambda-8cc.lam | bin/lam2bin | bin/asc2bin > lambda-8cc.Blc  # Prepare format for uni++
+```
 
+Then rot13.c can be compiled as:
+
+```sh
 $ cat lambda-8cc.Blc examples/rot13.c | bin/uni++ -o > a.out
 $ chmod 755 a.out
 
