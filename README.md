@@ -1,5 +1,5 @@
 # lambda-8cc: x86 C Compiler Written in Untyped Lambda Calculus
-lambda-8cc is a x86 C compiler written as a monolithic closed untyped lambda calculus term.
+lambda-8cc is an x86 C compiler written as a monolithic closed untyped lambda calculus term.
 The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip).
 
 As a sneak peek, [rot13.c](examples/rot13.c) is a program that compiles on gcc with no errors.
@@ -24,7 +24,7 @@ and a modified version of [ELVM](https://github.com/shinh/elvm) by [Shinichiro H
 
 ## Overview
 ### Everything is Done as Lambdas
-lambda-8cc is written as a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs a x86 executable expressed as a list of bytes.
+lambda-8cc is written as a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs an x86 executable expressed as a list of bytes.
 Characters and bytes are encoded as a list of bits with $0 = \lambda x. \lambda y.x$, $1 = \lambda x. \lambda y.y$,
 and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with ${\rm cons} = \lambda x.\lambda y.\lambda f.(f x y)$, ${\rm nil} = \lambda x.\lambda y.y$.
 
@@ -48,6 +48,9 @@ Compiled lambda calculus terms run on the same lambda calculus interpreter used 
 This makes lambda-8cc self-contained in the realm of lambda calculus.
 The output program can also be run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by Justine Tunney,
 and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by [John Tromp](https://github.com/tromp) (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
+
+It has long been known in computer science that lambda calculus is turing-complete.
+lambda-8cc shows this in a rather straightforward way by demonstrating that C programs can directly be compiled to lambda calculus terms.
 
 The nice thing about lambda calculus is that the language specs are extremely simple.
 With lambda-8cc, in a way we are preserving knowledge about how to compile C in a timeless method.
@@ -107,13 +110,6 @@ This takes about 8 minutes to run on my machine.
 More running time stats are available in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 Detailed usage instructions are available in the [Usage](#usage) section.
 
-rot13.c can be used to decode the hint message of the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by [John Tromp](https://github.com/tromp), uncovering some of the secrets of the magical lambda calculus interpreter which the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in shape of a λ:
-
-```sh
-wget https://www.ioccc.org/2012/tromp/how13
-cat how13 | ./a.out
-```
-
 More example C programs compilable by lambda-8cc can be found under [./examples](./examples).
 
 
@@ -130,11 +126,13 @@ Binary lambda calculus (BLC) is a highly compact notation for writing lambda cal
 Any lambda term with an arbitrary number of variables can be rewritten to BLC notation.
 For example, $\lambda x.x$ becomes `0010`.
 I've written details on the BLC notation in [one of my blog posts](https://woodrush.github.io/blog/lambdalisp.html#the-binary-lambda-calculus-notation).
-The output of `cat lambda-8cc.lam | bin/lam2bin` is available as [./bin/lambda-8cc.blc.zip](./bin/lambda-8cc.blc.zip).
 
 [asc2bin](https://github.com/woodrush/lambda-calculus-devkit/blob/main/src/asc2bin.c) is a utility that packs the 0/1 BLC bitstream in ASCII to a byte stream.
 Using this tool, the encoding `0010` for $\lambda x.x$ becomes only half a byte.
 The interpreter uni++ accepts lambda terms in the byte-packed BLC format, converted above using lam2bin and asc2bin.
+
+The output of `cat lambda-8cc.lam | bin/lam2bin` is available as [./bin/lambda-8cc.blc.zip](./bin/lambda-8cc.blc.zip).
+Note that this is different from the uppercase lambda-8cc.Blc after passing it to asc2bin.
 
 All in all, the conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
 
@@ -172,6 +170,20 @@ The following few lines are memory initialization values.
 The next lines with indentation are the instruction list shown in [rot13.s](out/rot13.s) encoded as lambda calculus terms
 passed to LambdaVM.
 
+rot13.lam can be run on [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) binary lambda calculus interpreter written by [John Tromp](https://github.com/tromp).
+It can be used to decipher its hint message [how13](https://www.ioccc.org/2012/tromp/how13), uncovering some of the secrets of the magical lambda calculus interpreter which the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in shape of a λ:
+
+```sh
+wget https://www.ioccc.org/2012/tromp/tromp.c
+gcc -Wall -W -std=c99 -O2 -m64 -DInt=long -DA=9999999 -DX=8 tromp.c -o tromp
+
+wget https://www.ioccc.org/2012/tromp/how13
+
+cat rot13.lam | bin/lam2bin | bin/asc2bin > rot13.Blc
+cat rot13.Blc how13 | ./tromp
+```
+
+These commands run on Linux. Building `tromp` on a Mac is a little tricky but possible - I've covered the details [here](https://github.com/woodrush/lambdalisp#building-tromp-on-a-mac).
 
 
 ## How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
@@ -222,7 +234,7 @@ As mentioned earlier, not only can lambda-8cc compile C to x86, it can compile C
 
 Here is a full list of features supported by lambda-8cc:
 
-- Compile C to a x86 executable (a.out)
+- Compile C to an x86 executable (a.out)
 - Compile C to a lambda calculus term (executable on the terminal with a lambda calculus interpreter)
 - Compile C to a binary lambda calculus program (runnable on [SectorLambda](https://justine.lol/lambda/) and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter)
 - Compile C to a [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (runnable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
@@ -311,7 +323,7 @@ To compile [hello.c](./examples/hello.c) to x86 using lambda-8cc, simply run:
 make
 ```
 
-This will unzip [lambda-8cc.zip](./bin/lambda-8cc.zip),
+This will unzip [lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip),
 build the [lambda calculus interpreter](https://github.com/melvinzhang/binary-lambda-calculus) `uni++` written by [Melvin Zhang](https://github.com/melvinzhang),
 and run lambda-8cc on `uni++` creating `a.out`.
 You can then run `a.out` as follows, just as you would do in gcc:
@@ -326,7 +338,7 @@ Hello, world!
 
 ```sh
 make uni++ lam2bin asc2bin
-unzip bin/lambda-8cc.zip
+unzip bin/lambda-8cc.lam.zip
 cat lambda-8cc.lam | ./bin/lam2bin > lambda-8cc.blc
 cat lambda-8cc.blc | ./bin/asc2bin > lambda-8cc.Blc
 
