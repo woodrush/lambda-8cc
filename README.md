@@ -4,15 +4,15 @@
 
 lambda-8cc is an x86 C compiler written as a monolithic closed untyped lambda calculus term.
 
-Printed on letter-sized paper, it becomes 18,506 pages long as a 22 MB PDF without any figures.
-The PDF is available on my GitHub Pages [here](https://woodrush.github.io/lambda-8cc.pdf).
-You can also see it as a zipped plaintext file in this repo [here](./bin/lambda-8cc.lam.zip).
+Printed on letter-sized paper, it becomes 18,506 pages long on a 22 MB PDF without any figures.
+The PDF can be seen on my GitHub Pages [here](https://woodrush.github.io/lambda-8cc.pdf).
+A zipped plaintext file is also available in this repo [here](./bin/lambda-8cc.lam.zip).
 The LaTeX source is 448 MB, and the LaTeX compilation log file `main.log` is 284 MB. I couldn't believe LaTeX was able to do that.
 
 Here's the first page of the PDF:
 
 This gigantic lambda calculus term is a C compiler. Here is [rot13.c](examples/rot13.c), a program that compiles on GCC with no errors.
-The exact same program can be compiled with lambda-8cc producing the x86 executable [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
+The same program can be compiled using lambda-8cc producing the x86 executable [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
 
 ```sh
 $ echo "Hello, world!" | ./rot13.bin
@@ -25,7 +25,7 @@ Despite its massive size, compiling rot13.c finishes in 8 minutes on my machine 
 You can try it out on your own PC by cloning this repo.
 Running time stats are summarized in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 
-Not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms, producing something like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself.
+As an additional feature, not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms, producing something like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself.
 
 Using its [compilation options](#compilation-options), lambda-8cc can compile C to 5 different formats. Here is a full list of its features:
 
@@ -185,7 +185,8 @@ Other compilation options are described in the [Detailed Usage](#detailed-usage)
 
 ## Detailed Usage
 ### Compilation Options
-You can use lambda-8cc's full features by passing compilation options. Being written in lambda calculus, naturally, lambda-8cc's compilation options are written in lambda calculus terms as well.
+Being written in lambda calculus, naturally, lambda-8cc's compilation options are expressed as lambda calculus terms as well.
+These options can be used to unlock the full features of lambda-8cc.
 
 Compilation options are used by applying an optional term as `(lambda-8cc option)` beforehand of the input. This changes the behavior of the lambda term `lambda-8cc` so that it accepts/produces a different input/output format.
 
@@ -205,8 +206,8 @@ Here are all of lambda-8cc's compilation options:
 | ELVM assembly | SKI combinator calculus (Lazy K program)        | $\lambda f. (f ~ (\lambda x. \lambda y. y) ~ (\lambda x.\lambda y.\lambda z.\lambda a.\lambda b.a) ~ (\lambda x.x))$ |
 
 Each option is in the format of a 3-tuple ${\rm cons3} ~ {\rm input} ~ {\rm output} ~ X$ where ${\rm cons 3} = \lambda x. \lambda y. \lambda z. \lambda f. (f x y z)$.
-The first element ${\rm input}$ is a selector of a 2-tuple that specifies the input format.
-The second element ${\rm output}$ is a selector of a 5-tuple that specifies the output format.
+The first element ${\rm input}$ is a selector of a 2-tuple specifying the input format.
+The second element ${\rm output}$ is a selector of a 5-tuple specifying the output format.
 The third element $X = \lambda x.x$ is a placeholder used to distinguish the data structure from the standard input,
 also existing for backward portability in the case when more options are added in the future.
 
