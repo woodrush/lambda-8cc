@@ -158,15 +158,15 @@ All in all, the conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a tra
 
 
 ## About rot13.lam
-[rot13.c](examples/rot13.c) compiles to [rot13.lam](out/rot13.lam), which runs on the same lambda calculus interpreter uni++.
+[rot13.c](examples/rot13.c) compiles to [rot13.lam](out/rot13.lam), which runs on the same lambda calculus interpreter used to run lambda-8cc itself.
 
-The first line in [rot13.lam](out/rot13.lam) is [LambdaVM](https://github.com/woodrush/lambdavm), described in the next section.
+The first line in [rot13.lam](out/rot13.lam) is [LambdaVM](https://github.com/woodrush/lambdavm).
 The following few lines are memory initialization values.
 The next lines with indentation are the instruction list shown in [rot13.s](out/rot13.s) encoded as lambda calculus terms
 passed to LambdaVM.
 
-rot13.lam can be run on [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) binary lambda calculus interpreter written by [John Tromp](https://github.com/tromp).
-It can be used to decipher its hint message [how13](https://www.ioccc.org/2012/tromp/how13), uncovering some of the secrets of the magical lambda calculus interpreter which the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in shape of a λ:
+rot13.lam can be run on the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) binary lambda calculus interpreter written by [John Tromp](https://github.com/tromp).
+It can be used to decipher its hint message [how13](https://www.ioccc.org/2012/tromp/how13), uncovering some of the secrets of the magical lambda calculus interpreter which its [source](https://www.ioccc.org/2012/tromp/tromp.c) is in shape of a λ:
 
 ```sh
 wget https://www.ioccc.org/2012/tromp/tromp.c

@@ -272,6 +272,8 @@ If you run Linux and have any free storage or a USB drive,
 you can use that storage to easily and dynamically extend your swap region using `mkswap` and `swapon`.
 The stats on this table are run with an extended swap region this way.
 Instructions are explained in this [askubuntu thread](https://askubuntu.com/questions/178712/how-to-increase-swap-space).
+I suspect that the RAM usage can be decreased by introducing a mark-and-sweep GC to the interpreter,
+although I haven't confirmed it yet.
 
 Note that these are the compilation times - the running times for the compiled x86 binary are instantaneous.
 This even holds when compiling C to lambda calculus terms.
