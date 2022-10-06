@@ -12,9 +12,9 @@ This gigantic lambda calculus term is a C compiler. Here is [rot13.c](examples/r
 The same program can be compiled using lambda-8cc producing the x86 executable [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
 
 ```sh
-$ echo "Hello, world!" | ./rot13.bin
+$ echo 'Hello, world!' | ./rot13.bin
 Uryyb, jbeyq!
-$ echo "Uryyb, jbeyq!" | ./rot13.bin
+$ echo 'Uryyb, jbeyq!' | ./rot13.bin
 Hello, world!
 ```
 
@@ -169,9 +169,9 @@ Then rot13.c can be compiled as:
 $ cat lambda-8cc.Blc examples/rot13.c | bin/uni++ -o > a.out
 $ chmod 755 a.out
 
-$ echo "Hello, world!" | ./a.out
+$ echo 'Hello, world!' | ./a.out
 Uryyb, jbeyq!
-$ echo "Uryyb, jbeyq!" | ./a.out
+$ echo 'Uryyb, jbeyq!' | ./a.out
 Hello, world!
 ```
 
