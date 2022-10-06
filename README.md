@@ -8,11 +8,6 @@ When printed on letter-sized paper, it becomes 18,506 pages long on a 22 MB PDF 
 The PDF can be seen on my GitHub Pages [here](https://woodrush.github.io/lambda-8cc.pdf).
 The LaTeX source is 448 MB, and the LaTeX compilation log file `main.log` is 284 MB. I couldn't believe LaTeX was able to do that.
 
-<!-- A zipped plaintext file is also available in this repo [here](./bin/lambda-8cc.lam.zip). -->
-
-
-Here's the first page of the PDF:
-
 This gigantic lambda calculus term is a C compiler. Here is [rot13.c](examples/rot13.c), a program that compiles on GCC with no errors.
 The same program can be compiled using lambda-8cc producing the x86 executable [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
 
@@ -27,6 +22,12 @@ Despite its massive size, compiling rot13.c finishes in 8 minutes on my machine 
 You can try it out on your own PC by cloning this repo.
 Running time stats are summarized in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 Note that although the compilation takes time, the compiled binary runs instantaneously.
+
+<!-- A zipped plaintext file is also available in this repo [here](./bin/lambda-8cc.lam.zip). -->
+
+The first page of the PDF looks like this. Notice the page count on the top left:
+
+<img src="bin/lambda-8cc-page1.png" width="600px" alt="The first page of a PDF showing lambda-8cc's lambda term">
 
 
 ### Additional Feature: C to Lambda Calculus
