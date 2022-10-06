@@ -182,7 +182,7 @@ You can use lambda-8cc's full features by passing compilation options. Being wri
 Compilation options are used by applying an optional term as `(lambda-8cc option)` beforehand of the input. This changes the behavior of the lambda term `lambda-8cc` so that it accepts/produces a different input/output format.
 
 
-Here are the full list of lambda-8cc's compilation options:
+Here are all of lambda-8cc's compilation options:
 
 | Input         | Output                                          | Compilation Option                                                                                                      |
 |---------------|-------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
