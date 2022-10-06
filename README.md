@@ -25,11 +25,6 @@ Note that although the compilation takes time, the compiled binary runs instanta
 
 <!-- A zipped plaintext file is also available in this repo [here](./bin/lambda-8cc.lam.zip). -->
 
-The first page of the PDF looks like this. Notice the page count on the top left:
-
-<img src="bin/lambda-8cc-page1.png" width="600px" alt="The first page of a PDF showing lambda-8cc's lambda term">
-
-
 ### Additional Feature: C to Lambda Calculus
 As an additional feature, not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms, producing something like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself.
 
@@ -54,6 +49,15 @@ The first one is [LambdaVM](https://github.com/woodrush/lambdavm) written by the
 a programmable virtual CPU written as an untyped lambda calculus term.
 This is combined with [8cc](https://github.com/rui314/8cc) by [Rui Ueyama](https://github.com/rui314),
 and a modified version of [ELVM](https://github.com/shinh/elvm) by [Shinichiro Hamaji](https://github.com/shinh).
+
+## Gallery
+The first page of the PDF looks like this. Notice the page count on the top left:
+
+![The first page of a PDF showing lambda-8cc's lambda term](bin/lambda-8cc-page1.png)
+
+Its grand finale is a round of applause by a page full of right parentheses:
+
+![The last page of a PDF showing lambda-8cc's lambda term](bin/lambda-8cc-page18506.png)
 
 
 ## Overview
