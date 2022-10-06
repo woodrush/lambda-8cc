@@ -4,10 +4,12 @@
 
 lambda-8cc is an x86 C compiler written as a monolithic closed untyped lambda calculus term.
 
-Printed on letter-sized paper, it becomes 18,506 pages long on a 22 MB PDF without any figures.
+When printed on letter-sized paper, it becomes 18,506 pages long on a 22 MB PDF without any figures.
 The PDF can be seen on my GitHub Pages [here](https://woodrush.github.io/lambda-8cc.pdf).
-A zipped plaintext file is also available in this repo [here](./bin/lambda-8cc.lam.zip).
 The LaTeX source is 448 MB, and the LaTeX compilation log file `main.log` is 284 MB. I couldn't believe LaTeX was able to do that.
+
+<!-- A zipped plaintext file is also available in this repo [here](./bin/lambda-8cc.lam.zip). -->
+
 
 Here's the first page of the PDF:
 
@@ -24,7 +26,10 @@ Hello, world!
 Despite its massive size, compiling rot13.c finishes in 8 minutes on my machine using a lambda calculus interpreter.
 You can try it out on your own PC by cloning this repo.
 Running time stats are summarized in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
+Note that although the compilation takes time, the compiled binary runs instantaneously.
 
+
+### Additional Feature: C to Lambda Calculus
 As an additional feature, not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms, producing something like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself.
 
 Using its [compilation options](#compilation-options), lambda-8cc can compile C to 5 different formats. Here is a full list of its features:
@@ -38,9 +43,9 @@ Using its [compilation options](#compilation-options), lambda-8cc can compile C 
 - Compile ELVM assembly to:
   - x86/lambda calculus/BLC/SKI combinator calculus (all of the above)
 
-[Lazy K](https://tromp.github.io/cl/lazy-k.html) is a minimal purely functional language with only 4 built-in operators,
+Among the list is [Lazy K](https://tromp.github.io/cl/lazy-k.html), a minimal purely functional language with only 4 built-in operators,
 similar to the minimal imperative language [BF](https://en.wikipedia.org/wiki/Brainfuck) which only has 8 instructions.
-I have covered a little bit about it on [my blog post](https://woodrush.github.io/blog/lambdalisp.html#lazy-k) as well.
+I have covered a little bit about it in [my blog post](https://woodrush.github.io/blog/lambdalisp.html#lazy-k) as well.
 
 
 lambda-8cc is based on the following 3 projects:
@@ -74,7 +79,7 @@ please see the implementation details of my other project [LambdaLisp](https://g
 a Lisp interpreter written as an untyped lambda calculus term.
 
 
-### Additional Feature: C to Lambda Calculus
+### C to Lambda Calculus
 In addition to x86, lambda-8cc can compile C to lambda calculus as well.
 The output program runs on the same lambda calculus interpreter used to run lambda-8cc itself.
 Compiled lambda terms also run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by [Justine Tunney](https://github.com/jart),
