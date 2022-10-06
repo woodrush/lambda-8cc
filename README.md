@@ -15,53 +15,13 @@ $ echo "Uryyb, jbeyq!" | ./rot13.bin
 Hello, world!
 ```
 
-Not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself. lambda-8cc first compiles C programs to an intermediate assembly ([rot13.s](out/rot13.s)) and then compiles it to various formats.
+Compiling rot13.c finishes in 8 minutes on my machine.
+Running time stats are summarized in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 
-lambda-8cc is based on the following 3 projects:
-The first one is [LambdaVM](https://github.com/woodrush/lambdavm) written by the author of this repo [Hikaru Ikuta](https://github.com/woodrush),
-a programmable virtual CPU written as an untyped lambda calculus term.
-This is combined with [8cc](https://github.com/rui314/8cc) by [Rui Ueyama](https://github.com/rui314),
-and a modified version of [ELVM](https://github.com/shinh/elvm) by [Shinichiro Hamaji](https://github.com/shinh).
+Not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself.
+Using its [compilation options](#compilation-options), it can compile C to 5 different formats including an intermediate assembly listing ([rot13.s](out/rot13.s)).
 
-
-## Overview
-### Lambdas All the Way Down
-lambda-8cc is written as a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs an x86 Linux ELF executable expressed as a list of bytes.
-Characters and bytes are encoded as a list of bits with $0 = \lambda x. \lambda y.x$, $1 = \lambda x. \lambda y.y$,
-and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with ${\rm cons} = \lambda x.\lambda y.\lambda f.(f x y)$, ${\rm nil} = \lambda x.\lambda y.y$.
-
-Therefore, _everything_ in the computation process, even including integers, is expressed as pure lambda terms,
-without the need of introducing any non-lambda type object whatsoever.
-lambda-8cc makes [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#%CE%B2-reduction) the sole requirement for compiling C to x86.
-Note that the process doesn't depend on the choice of variable names as well.
-Instead of encoding the character `A` as a variable with the name $A$, `A` is encoded as a list of bits of its ASCII encoding `01000001`.
-
-Various lambda calculus interpreters automatically handle this I/O format so that it runs on the terminal - standard input is encoded into lambda terms, and the output lambda term is decoded and shown on the terminal.
-Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like GCC.
-
-For further details on how I/O is handled and how programs are written in lambda calculus,
-please see the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
-a Lisp interpreter written as an untyped lambda calculus term.
-
-
-### C to Lambda Calculus
-lambda-8cc can compile C to lambda calculus, making lambda-8cc self-contained in the realm of lambda calculus.
-The output program can also be run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by [Justine Tunney](https://github.com/jart),
-and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by [John Tromp](https://github.com/tromp) (the [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
-
-It has long been known in computer science that lambda calculus is Turing-complete.
-lambda-8cc demonstrates this in a rather straightforward way by showing that C programs can directly be compiled into lambda calculus terms.
-
-The nice thing about lambda calculus is that the language specs are extremely simple.
-With lambda-8cc, we are preserving knowledge about how to compile C in a timeless method.
-Even if humanity loses knowledge about the x86 instruction set,
-as long as we remember the rules for lambda calculus and have [the lambda term for lambda-8cc](./bin/lambda-8cc.lam.zip),
-we can still use the entire C language through lambda-8cc and build everything on top of it again.
-
-
-## Features
-lambda-8cc supports various input and output formats.
-Here is a full list of its features:
+Here is a full list of features:
 
 - Compile C to:
   - x86 executable (a.out)
@@ -76,6 +36,51 @@ Here is a full list of its features:
 similar to the minimal imperative language [BF](https://en.wikipedia.org/wiki/Brainfuck) which only has 8 instructions.
 I have covered a little bit about it on [my blog post](https://woodrush.github.io/blog/lambdalisp.html#lazy-k) as well.
 
+
+lambda-8cc is based on the following 3 projects:
+The first one is [LambdaVM](https://github.com/woodrush/lambdavm) written by the author of this repo [Hikaru Ikuta](https://github.com/woodrush),
+a programmable virtual CPU written as an untyped lambda calculus term.
+This is combined with [8cc](https://github.com/rui314/8cc) by [Rui Ueyama](https://github.com/rui314),
+and a modified version of [ELVM](https://github.com/shinh/elvm) by [Shinichiro Hamaji](https://github.com/shinh).
+
+
+## Overview
+### Lambdas All the Way Down
+lambda-8cc is written as a closed untyped lambda calculus term ${\rm lambda8cc} = \lambda x. \cdots$ which takes an input string $x$ representing a C program and outputs an x86 Linux ELF executable expressed as a list of bytes.
+
+Here, even strings are encoded as lambda terms. Characters and bytes are encoded as a list of bits with $0 = \lambda x. \lambda y.x$, $1 = \lambda x. \lambda y.y$,
+and lists are encoded in the [Scott encoding](https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding) with ${\rm cons} = \lambda x.\lambda y.\lambda f.(f x y)$, ${\rm nil} = \lambda x.\lambda y.y$.
+
+Therefore, _everything_ in the computation process, even including integers, is closed in the world of pure lambda terms,
+without the need of introducing any non-lambda type object whatsoever.
+It doesn't use any primitive types other than lambdas.
+lambda-8cc makes [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#%CE%B2-reduction) the sole requirement for compiling C to x86.
+Note that the process doesn't depend on the choice of variable names as well.
+Instead of encoding the character `A` as a variable with the name $A$, `A` is encoded as a list of bits of its ASCII encoding `01000001`.
+
+Various lambda calculus interpreters automatically handle this I/O format so that it runs on the terminal - standard input is encoded into lambda terms, and the output lambda term is decoded and shown on the terminal.
+Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like GCC.
+
+For further details on how I/O is handled and how programs are written in lambda calculus,
+please see the implementation details of my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
+a Lisp interpreter written as an untyped lambda calculus term.
+
+
+### Additional Feature: C to Lambda Calculus
+In addition to x86, lambda-8cc can compile C to lambda calculus as well.
+The output program runs on the same lambda calculus interpreter used to run lambda-8cc itself.
+Compiled lambda terms also run on minimal interpreters such as the 521-byte lambda calculus interpreter [SectorLambda](https://justine.lol/lambda/) written by [Justine Tunney](https://github.com/jart),
+and the [IOCCC](https://www.ioccc.org/) 2012 ["Most functional"](https://www.ioccc.org/2012/tromp/hint.html) interpreter written by [John Tromp](https://github.com/tromp) (its [source](https://www.ioccc.org/2012/tromp/tromp.c) is in the shape of a λ).
+This makes lambda-8cc self-contained in the realm of lambda calculus.
+
+It has long been known in computer science that lambda calculus is Turing-complete.
+lambda-8cc demonstrates this in a rather straightforward way by showing that C programs can directly be compiled into lambda calculus terms.
+
+The nice thing about lambda calculus is that the language specs are extremely simple.
+With lambda-8cc, we are preserving knowledge about how to compile C in a timeless method.
+Even if humanity loses knowledge about the x86 instruction set,
+as long as we remember the rules for lambda calculus and have [the lambda term for lambda-8cc](./bin/lambda-8cc.lam.zip),
+we can still use the entire C language through lambda-8cc and build everything on top of it again.
 
 
 ## Basic Usage Example
@@ -140,7 +145,7 @@ The tools built here are:
 The tools are build via the [lambda calculus development kit](https://github.com/woodrush/lambda-calculus-devkit).
 
 The conversion from lambda-8cc.lam to lambda-8cc.Blc is simply a transformation of notation for a format that's accepted by the interpreter uni++.
-Details are described in [details.md](details.md).
+Details are described in [details.md](details.md#what-is-lambda-8ccblc).
 
 
 ### Compile the Program Using lambda-8cc
