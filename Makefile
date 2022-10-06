@@ -23,6 +23,10 @@ SBCL=sbcl
 LAZYK=./bin/lazyk
 BLCAIT=./bin/blc-ait
 BCL2SKI=./bin/bcl2ski
+LATEX=latex
+DVIPDFMX=dvipdfmx
+target_latex=out/lambda-8cc.tex
+target_pdf=lambda-8cc.pdf
 
 # Input C file
 INPUT=input.c
@@ -59,6 +63,24 @@ $(INPUT): examples/hello.c
 tools: $(LAM2BIN) $(ASC2BIN) $(UNIPP)
 
 test: test-compile
+
+pdf: $(target_pdf)
+
+#================================================================
+# Build the PDF
+#================================================================
+.PRECIOUS: $(target_latex)
+$(target_latex):./src/lambda-8cc.cl ./tools/main.tex ./tools/make-latex.sh
+	mkdir -p ./out
+	./tools/make-latex.sh
+	mv lambda-8cc.tex out
+
+.PHONY: pdf
+$(target_pdf): $(target_latex) $(LAMBDA8CC)
+	cp ./tools/main.tex out
+	cd out; $(LATEX) main.tex
+	cd out; $(DVIPDFMX) main.dvi -o $@
+	mv out/$@ .
 
 
 #================================================================
