@@ -175,23 +175,6 @@ More example C programs compilable by lambda-8cc can be found under [./examples]
 Other compilation options are described in the [Detailed Usage](#detailed-usage) section.
 
 
-## How is it Done? - A Programmable Virtual CPU Written in Lambda Calculus
-To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm).
-LambdaVM is a programmable virtual CPU with an arbitrarily configurable ROM/RAM address
-and word size with an arbitrary number of registers, expressed as a single lambda calculus term.
-LambdaVM is also a self-contained project where you can enjoy assembly programming in lambda calculus.
-
-Despite its rich capability, LambdaVM has a compact lambda calculus term shown in [this image](bin/lambdavm.png).
-The image at the top shows LambdaVM drawn as a [lambda diagram](http://tromp.github.io/cl/diagrams.html).
-
-Based on LambdaVM, I built lambda-8cc by porting the C compiler [8cc](https://github.com/rui314/8cc) written in C by [Rui Ueyama](https://github.com/rui314) to LambdaVM.
-This is done by compiling 8cc's C source code to an assembly for LambdaVM.
-To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastructure written by [Shinichiro Hamaji](https://github.com/shinh)
-to build a C compiler for LambdaVM, which I used to compile 8cc itself.
-
-The entire monolithic 40MB lambda calculus term is handled solely by this tiny virtual machine to run lambda-8cc.
-
-
 ## Detailed Usage
 ### Compilation Options
 You can use lambda-8cc's full features by passing compilation options. Being written in lambda calculus, naturally, lambda-8cc's compilation options are written in lambda calculus terms as well.
@@ -309,6 +292,9 @@ make
 which compiles `a.s` and `a.out` for `input.c` separately to save the total memory usage.
 A more detailed table of stats for each pass is shown in [details.md](details.md).
 
+
+## How is it done?
+Please see [details.md](details.md).
 
 ## Building From Source
 For details on building from source, please see [details.md](details.md).

@@ -1,5 +1,26 @@
 # lambda-8cc Details
 
+## How is it Done?
+To build lambda-8cc, I first made [LambdaVM](https://github.com/woodrush/lambdavm).
+LambdaVM is a programmable virtual CPU with an arbitrarily configurable ROM/RAM address
+and word size with an arbitrary number of registers, expressed as a single lambda calculus term.
+LambdaVM is also a self-contained project where you can enjoy assembly programming in lambda calculus.
+
+Despite its rich capability, LambdaVM has a compact lambda calculus term shown in [this image](bin/lambdavm.png).
+The image at the top of [README.md](README.md) shows LambdaVM drawn as a [lambda diagram](http://tromp.github.io/cl/diagrams.html).
+
+Based on LambdaVM, I built lambda-8cc by porting the C compiler [8cc](https://github.com/rui314/8cc) written in C by [Rui Ueyama](https://github.com/rui314) to LambdaVM.
+This is done by compiling 8cc's C source code to an assembly for LambdaVM.
+To do this, I modified the [ELVM](https://github.com/shinh/elvm) infrastructure written by [Shinichiro Hamaji](https://github.com/shinh)
+to build a C compiler for LambdaVM, which I used to compile 8cc itself.
+
+The entire monolithic 40MB lambda calculus term is single-handedly managed by this tiny virtual machine to run lambda-8cc.
+
+
+## How Does the Virtual CPU Work?
+This is explained in detail in the [LambdaVM](https://github.com/woodrush/lambdavm) repo.
+
+
 ## Building From Source
 ### Requirements
 - clang++ (Ubuntu clang version 14.0.0-1ubuntu1) (used for building uni++)
