@@ -251,26 +251,26 @@ $(LAMBDA8CCLAZY): build/lambda-8cc-main.lazy $(8CCLAM).lazy $(ELCLAM).lazy
 #================================================================
 # Build 8cc.lam and elc.lam
 #================================================================
-elvm-private/Makefile:
+elvm/Makefile:
 	git submodule update --init --remote
 
 .PHONY: 8cc
 8cc: $(8CC)
-$(8CC): elvm-private/Makefile
-	cd elvm-private && make out/8cc && cp out/8cc ../bin
+$(8CC): elvm/Makefile
+	cd elvm && make out/8cc && cp out/8cc ../bin
 
 .PHONY: elc
 elc: $(ELC)
-$(ELC): elvm-private/Makefile
-	cd elvm-private && make out/elc && cp out/elc ../bin
+$(ELC): elvm/Makefile
+	cd elvm && make out/elc && cp out/elc ../bin
 
-build/8cc.c: elvm-private/Makefile
+build/8cc.c: elvm/Makefile
 	mkdir -p out
-	cd elvm-private && make out/8cc.c && tools/merge_c.rb out/8cc.c > ../build/8cc.c
+	cd elvm && make out/8cc.c && tools/merge_c.rb out/8cc.c > ../build/8cc.c
 
-build/elc.c: elvm-private/Makefile
+build/elc.c: elvm/Makefile
 	mkdir -p out
-	cd elvm-private && make out/elc.c && tools/merge_c.rb out/elc.c > ../build/elc.c
+	cd elvm && make out/elc.c && tools/merge_c.rb out/elc.c > ../build/elc.c
 
 build/8cc.eir: build/8cc.c $(8CC)
 	$(8CC) -S -o $@ $<
@@ -290,7 +290,7 @@ $(ELCLAM): build/elc.eir $(ELC)
 #================================================================
 $(LAMBDATOOLS):
 	mkdir -p build
-	cd build; git clone github.com:woodrush/lambda-calculus-devkit
+	cd build; git clone https://github.com/woodrush/lambda-calculus-devkit
 
 .PHONY: uni++
 uni++: $(UNIPP)
