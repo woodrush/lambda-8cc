@@ -3,14 +3,15 @@ set -e
 
 cat lambda-8cc.lam \
 | tr "\n" "@" \
-| LC_ALL=C sed 's/f@/f/g' \
-| LC_ALL=C sed 's/@/\n/g' \
-| LC_ALL=C sed -e "s/^/@_ $/g" \
-| LC_ALL=C sed -e "s/$/$ @/g" \
-| LC_ALL=C sed -e "s/\\\\/@\\\\allowbreak \\\\lambda /g" \
-| LC_ALL=C sed -e "s/(/@\\\\allowbreak (/g" \
-| LC_ALL=C sed -e "s/)/@) \\\\allowbreak /g" \
-| LC_ALL=C sed -e "s/\./.\\\\allowbreak /g" \
-| LC_ALL=C tr "@" "\n" \
-| LC_ALL=C sed -e "s/_/\\\\noindent/g" \
+| sed 's/f@/f/g' \
+| sed 's/@/\n/g' \
+| sed -e "s/^/@_ $/g" \
+| sed -e "s/$/$ @/g" \
+| sed -e "s/\\\\/@\\\\allowbreak \\\\lambda /g" \
+| sed -e "s/(/@\\\\allowbreak (/g" \
+| sed -e "s/)/@) \\\\allowbreak /g" \
+| sed -e "s/\./.\\\\allowbreak /g" \
+| sed -e '0,/@_/ s/@_//' \
+| tr "@" "\n" \
+| sed -e "s/_/\\\\noindent/g" \
 > lambda-8cc.tex
