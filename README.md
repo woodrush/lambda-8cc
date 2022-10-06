@@ -3,10 +3,16 @@
 ![Lambda calculus diagram for LambdaVM.](bin/lambdavm-diagram.png)
 
 lambda-8cc is an x86 C compiler written as a monolithic closed untyped lambda calculus term.
-The entire plaintext lambda term is 40MB, available as a zipped file [./bin/lambda-8cc.lam.zip](./bin/lambda-8cc.lam.zip).
 
-As an example, [rot13.c](examples/rot13.c) is a program that compiles on GCC with no errors.
-The exact same program can be compiled with lambda-8cc producing the Linux ELF executable [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
+Printed on letter-sized paper, it becomes 18,506 pages long as a 22 MB PDF without any figures.
+The PDF is available on my GitHub Pages [here](https://woodrush.github.io/lambda-8cc.pdf).
+You can also see it as a zipped plaintext file in this repo [here](./bin/lambda-8cc.lam.zip).
+The LaTeX source is 448 MB, and the LaTeX compilation log file `main.log` is 284 MB. I couldn't believe LaTeX was able to do that.
+
+Here's the first page of the PDF:
+
+This gigantic lambda calculus term is a C compiler. Here is [rot13.c](examples/rot13.c), a program that compiles on GCC with no errors.
+The exact same program can be compiled with lambda-8cc producing the x86 executable [rot13.bin](out/rot13.bin), runnable on x86/x86-64 Linux:
 
 ```sh
 $ echo "Hello, world!" | ./rot13.bin
@@ -15,20 +21,20 @@ $ echo "Uryyb, jbeyq!" | ./rot13.bin
 Hello, world!
 ```
 
-Compiling rot13.c finishes in 8 minutes on my machine.
+Despite its massive size, compiling rot13.c finishes in 8 minutes on my machine using a lambda calculus interpreter.
+You can try it out on your own PC by cloning this repo.
 Running time stats are summarized in the [Running Times and Memory Usage](#running-times-and-memory-usage) section.
 
-Not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself.
-Using its [compilation options](#compilation-options), it can compile C to 5 different formats including an intermediate assembly listing ([rot13.s](out/rot13.s)).
+Not only can lambda-8cc compile C to x86, but it can also compile C to lambda calculus terms, producing something like [rot13.lam](out/rot13.lam). Compiled lambda terms run on the same lambda calculus interpreter used to run lambda-8cc itself.
 
-Here is a full list of features:
+Using its [compilation options](#compilation-options), lambda-8cc can compile C to 5 different formats. Here is a full list of its features:
 
 - Compile C to:
   - x86 executable (a.out)
   - Lambda calculus term (runs on the same interpreter as lambda-8cc)
   - [Binary lambda calculus](https://tromp.github.io/cl/Binary_lambda_calculus.html) program
   - [SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus) term (runnable as a [Lazy K](https://tromp.github.io/cl/lazy-k.html) program)
-  - [ELVM](https://github.com/shinh/elvm) assembly listing
+  - [ELVM](https://github.com/shinh/elvm) assembly listing (example: [rot13.s](out/rot13.s))
 - Compile ELVM assembly to:
   - x86/lambda calculus/BLC/SKI combinator calculus (all of the above)
 
@@ -58,6 +64,8 @@ lambda-8cc makes [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#
 Note that the process doesn't depend on the choice of variable names as well.
 Instead of encoding the character `A` as a variable with the name $A$, `A` is encoded as a list of bits of its ASCII encoding `01000001`.
 
+The encoding process is a little cumbersome to say at the least to do by hand.
+This can be solved by using a lambda calculus interpreter.
 Various lambda calculus interpreters automatically handle this I/O format so that it runs on the terminal - standard input is encoded into lambda terms, and the output lambda term is decoded and shown on the terminal.
 Using these interpreters, lambda-8cc can be run on the terminal to compile C programs just like GCC.
 
