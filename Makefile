@@ -66,6 +66,8 @@ test: test-compile
 
 pdf: $(target_pdf)
 
+.PHONY:build
+
 #================================================================
 # Build the PDF
 #================================================================
@@ -224,6 +226,11 @@ bin/lambda-8cc.blc.zip: out/lambda-8cc.blc
 
 $(LAMBDA8CCZIP):
 	cd out; unzip ../bin/lambda-8cc.lam.zip
+
+
+build: $(LAMBDA8CC) $(LAMBDA8CCZIP)
+	diff $^ || exit 1
+	@echo "Build check passed."
 
 
 #================================================================
