@@ -53,7 +53,26 @@ make lambda-8cc.lam
 ```
 
 
-## Self-Hosting Test
+## Tests
+### Build Test
+The build test can be run by:
+
+```sh
+make build
+```
+
+
+### Compilation Test
+The build and compilation tests can be run by:
+
+```sh
+make test
+```
+
+`make test` uses about 36 GB of memory.
+
+
+### Self-Hosting Test
 lambda-8cc is a port of [8cc](https://github.com/rui314/8cc).
 It is also made by compiling 8cc using 8cc itself.
 Therefore, given enough time and memory, lambda-8cc can compile its own C source code as well.
@@ -108,6 +127,7 @@ In my other project [LambdaLisp](https://github.com/woodrush/lambdalisp),
 I implemented a Lisp interpreter featuring closures and object-oriented programming in untyped lambda calculus.
 A thorough explanation of techniques used in this project is explained in [my blog post](https://woodrush.github.io/blog/lambdalisp.html) about LambdaLisp.
 A lot of techniques explained here are used to make lambda-8cc as well.
+
 
 
 ## Dependent Projects
