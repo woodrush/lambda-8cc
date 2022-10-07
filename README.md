@@ -2,6 +2,8 @@
 
 ![Lambda calculus diagram for LambdaVM.](bin/lambdavm-diagram.png)
 
+[![build](https://github.com/woodrush/lambda-8cc/actions/workflows/build.yml/badge.svg)](https://github.com/woodrush/lambda-8cc/actions/workflows/build.yml)
+
 lambda-8cc is an x86 C compiler written as a monolithic closed untyped lambda calculus term.
 
 When printed on letter-sized paper, it becomes 18,506 pages long on a 22 MB PDF without any figures.
